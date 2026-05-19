@@ -21,6 +21,7 @@ import { EPageStoreType } from "@/plane-web/hooks/store";
 import type { TPageInstance } from "@/store/pages/base-page";
 // local imports
 import { PageActions } from "../../dropdowns";
+import type { TPageActions } from "../../dropdowns/actions";
 import { ExportPageModal } from "../../modals/export-page-modal";
 import { PAGE_NAVIGATION_PANE_TABS_QUERY_PARAM } from "../../navigation-pane";
 
@@ -124,6 +125,17 @@ export const PageOptionsDropdown = observer(function PageOptionsDropdown(props: 
     ]
   );
 
+  // options order: wiki hides version-history, make-a-copy, archive-restore, toggle-access; always shows delete
+  const isWiki = storeType === EPageStoreType.WORKSPACE;
+  const optionsOrder: TPageActions[] = [
+    "full-screen",
+    "sticky-toolbar",
+    "copy-markdown",
+    ...(!isWiki ? (["version-history", "make-a-copy", "archive-restore", "toggle-access"] as TPageActions[]) : []),
+    "delete",
+    "export",
+  ];
+
   return (
     <>
       <ExportPageModal
@@ -132,20 +144,7 @@ export const PageOptionsDropdown = observer(function PageOptionsDropdown(props: 
         onClose={() => setIsExportModalOpen(false)}
         pageTitle={name ?? ""}
       />
-      <PageActions
-        extraOptions={EXTRA_MENU_OPTIONS}
-        optionsOrder={[
-          "full-screen",
-          "sticky-toolbar",
-          "copy-markdown",
-          ...(storeType !== EPageStoreType.WORKSPACE ? ["version-history", "make-a-copy"] : []),
-          "archive-restore",
-          ...(storeType !== EPageStoreType.WORKSPACE ? ["delete", "toggle-access"] : []),
-          "export",
-        ]}
-        page={page}
-        storeType={storeType}
-      />
+      <PageActions extraOptions={EXTRA_MENU_OPTIONS} optionsOrder={optionsOrder} page={page} storeType={storeType} />
     </>
   );
 });
