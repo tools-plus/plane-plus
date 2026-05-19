@@ -139,7 +139,7 @@ export const PageActions = observer(function PageActions(props: Props) {
           },
           title: "Delete",
           icon: TrashIcon,
-          shouldRender: canCurrentUserDeletePage && !!archived_at,
+          shouldRender: canCurrentUserDeletePage && (!!archived_at || storeType === EPageStoreType.WORKSPACE),
         },
         {
           key: "move",
@@ -167,6 +167,7 @@ export const PageActions = observer(function PageActions(props: Props) {
       canCurrentUserMovePage,
       isMovePageEnabled,
       pageOperations,
+      storeType,
     ]
   );
   // arrange options
