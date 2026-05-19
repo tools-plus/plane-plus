@@ -187,6 +187,12 @@ services:
     volumes:
       - .:/app
       - iw-node-modules:/app/node_modules
+    env_file:
+      - .env.iw-dev
+    environment:
+      # VITE vars must be in container env — Vite bakes them in at dev-server startup
+      VITE_LIVE_BASE_URL: ${VITE_LIVE_BASE_URL:-}
+      VITE_LIVE_BASE_PATH: ${VITE_LIVE_BASE_PATH:-/live}
     command: sh -c "until [ -f /app/node_modules/.iw-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=web"
     depends_on:
       - iw-api
@@ -236,6 +242,8 @@ services:
     volumes:
       - .:/app
       - iw-node-modules:/app/node_modules
+    env_file:
+      - .env.iw-dev
     environment:
       TURBO_TELEMETRY_DISABLED: "1"
       PORT: "3003"
