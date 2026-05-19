@@ -4,9 +4,7 @@
  */
 
 import { observer } from "mobx-react";
-import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { WikiIcon } from "@plane/propel/icons";
 // hooks
 import { usePageFolders } from "@/hooks/store/use-page-folders";
 
@@ -17,10 +15,9 @@ type Props = {
 };
 
 export const FolderBreadcrumb = observer(function FolderBreadcrumb(props: Props) {
-  const { workspaceSlug, pageId, pageName } = props;
+  const { pageId, pageName } = props;
   const folderStore = usePageFolders();
 
-  const wikiBasePath = `/${workspaceSlug}/wiki`;
   const folderId = pageId ? folderStore.getPageFolderId(pageId) : null;
   const folderPath = folderStore.getFolderPath(folderId);
 
@@ -31,21 +28,15 @@ export const FolderBreadcrumb = observer(function FolderBreadcrumb(props: Props)
 
   return (
     <nav className="flex items-center gap-1 px-4 py-2 text-13 text-secondary" aria-label="Breadcrumb">
-      {/* Wiki home */}
-      <Link href={wikiBasePath} className="flex items-center gap-1 transition-colors hover:text-primary">
-        <WikiIcon className="size-3.5" />
-        <span>Wiki</span>
-      </Link>
-
-      {/* Folder path */}
-      {folderPath.map((folder) => (
+      {/* Folder path — Wiki heading is now in the layout header, so breadcrumb starts from the first folder */}
+      {folderPath.map((folder, index) => (
         <span key={folder.id} className="flex items-center gap-1">
-          <ChevronRight className="size-3 text-tertiary" />
+          {index > 0 && <ChevronRight className="size-3 text-tertiary" />}
           <button
             type="button"
             className="transition-colors hover:text-primary"
             onClick={() => {
-              // Expand the folder in sidebar and navigate to wiki home
+              // Expand the folder in sidebar
               folderStore.setFolderExpanded(folder.id, true);
             }}
           >

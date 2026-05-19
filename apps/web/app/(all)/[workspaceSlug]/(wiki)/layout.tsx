@@ -8,6 +8,8 @@ import { useCallback, useState } from "react";
 import { observer } from "mobx-react";
 import { Outlet, useParams } from "react-router";
 import { Plus, Loader2 } from "lucide-react";
+// plane imports
+import { WikiIcon } from "@plane/propel/icons";
 // components
 import { AppSidebarToggleButton } from "@/components/sidebar/sidebar-toggle-button";
 import { ProjectsAppPowerKProvider } from "@/components/power-k/projects-app-provider";
@@ -67,7 +69,11 @@ function WikiLayout() {
           <div className="flex items-center justify-between gap-2 border-b border-subtle px-4 py-2">
             <div className="flex items-center gap-2">
               {sidebarCollapsed && <AppSidebarToggleButton />}
-              {/* Breadcrumb area — filled by page content via Outlet */}
+              {/* Permanent Wiki section heading */}
+              <div className="text-sm flex items-center gap-1.5 font-medium text-primary">
+                <WikiIcon className="size-4 flex-shrink-0" />
+                <span>Wiki</span>
+              </div>
             </div>
             <button
               type="button"

@@ -197,7 +197,7 @@ export const PageActions = observer(function PageActions(props: Props) {
               onClick={() => {
                 item.action?.();
               }}
-              className={cn("flex items-center gap-2", item.className)}
+              className={cn("flex items-center gap-2 rounded-none", item.className)}
               disabled={item.disabled}
             >
               {item.customContent ?? (
