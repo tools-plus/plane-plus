@@ -141,8 +141,10 @@ services:
     environment:
       <<: [*app-env, *db-env, *redis-env, *minio-env, *aws-s3-env, *proxy-env]
     depends_on:
-      - plane-db
-      - plane-redis
+      plane-db:
+        condition: service_healthy
+      plane-redis:
+        condition: service_started
 
   plane-db:
     image: postgres:15.7-alpine
@@ -152,6 +154,12 @@ services:
       <<: *db-env
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U ${POSTGRES_USER:-plane} -d ${POSTGRES_DB:-plane}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   plane-redis:
     image: valkey/valkey:7.2.11-alpine
