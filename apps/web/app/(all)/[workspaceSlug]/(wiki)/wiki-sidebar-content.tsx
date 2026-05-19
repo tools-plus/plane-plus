@@ -33,8 +33,8 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
   const folderStore = usePageFolders();
   const { loader, data, fetchPagesList, createPage, removePage } = wikiStore;
 
-  // All pages list (for passing to folder tree)
-  const pagesList = Object.values(data);
+  // All pages list (for passing to folder tree), excluding archived pages
+  const pagesList = Object.values(data).filter((p) => !p.archived_at);
 
   // Read pageFolderMap ref directly so MobX observer tracks it
   const pageFolderMap = folderStore.pageFolderMap;

@@ -16,7 +16,7 @@ import { usePageFilters } from "@/hooks/use-page-filters";
 import { useQueryParams } from "@/hooks/use-query-params";
 // plane web imports
 import type { TPageNavigationPaneTab } from "@/plane-web/components/pages/navigation-pane";
-import type { EPageStoreType } from "@/plane-web/hooks/store";
+import { EPageStoreType } from "@/plane-web/hooks/store";
 // store
 import type { TPageInstance } from "@/store/pages/base-page";
 // local imports
@@ -138,11 +138,9 @@ export const PageOptionsDropdown = observer(function PageOptionsDropdown(props: 
           "full-screen",
           "sticky-toolbar",
           "copy-markdown",
-          "version-history",
-          "make-a-copy",
+          ...(storeType !== EPageStoreType.WORKSPACE ? ["version-history", "make-a-copy"] : []),
           "archive-restore",
-          "delete",
-          "toggle-access",
+          ...(storeType !== EPageStoreType.WORKSPACE ? ["delete", "toggle-access"] : []),
           "export",
         ]}
         page={page}
