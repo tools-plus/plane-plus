@@ -239,7 +239,7 @@ services:
     environment:
       TURBO_TELEMETRY_DISABLED: "1"
       PORT: "3003"
-      LIVE_SERVER_SECRET_KEY: ${LIVE_SERVER_SECRET_KEY:-local-dev-secret-key}
+      LIVE_SERVER_SECRET_KEY: ${LIVE_SERVER_SECRET_KEY:-secret-key}
       REDIS_URL: redis://iw-redis:6379/
       API_BASE_URL: http://iw-api:8000
     command: sh -c "until [ -f /app/node_modules/.iw-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=live"
