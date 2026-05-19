@@ -238,6 +238,7 @@ services:
       - iw-node-modules:/app/node_modules
     environment:
       TURBO_TELEMETRY_DISABLED: "1"
+      PORT: "3003"
       LIVE_SERVER_SECRET_KEY: ${LIVE_SERVER_SECRET_KEY:-local-dev-secret-key}
       REDIS_URL: redis://iw-redis:6379/
       API_BASE_URL: http://iw-api:8000
