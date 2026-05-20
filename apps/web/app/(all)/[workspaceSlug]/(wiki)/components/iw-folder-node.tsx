@@ -6,6 +6,8 @@
 import { useCallback, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { ChevronRight, Folder, FolderOpen, MoreHorizontal } from "lucide-react";
+import { TOAST_TYPE, setToast } from "@plane/propel/toast";
+import { AlertModalCore } from "@plane/ui";
 import { cn } from "@plane/utils";
 // hooks
 import { usePageFolders } from "@/hooks/store/use-page-folders";
@@ -60,6 +62,8 @@ export const FolderNode = observer(function FolderNode(props: Props) {
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState("");
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeletingFolder, setIsDeletingFolder] = useState(false);
   const renameInputRef = useRef<HTMLInputElement>(null);
 
   // Pages in this folder, sorted alphabetically
@@ -120,19 +124,26 @@ export const FolderNode = observer(function FolderNode(props: Props) {
     }
   };
 
-  const handleDelete = useCallback(async () => {
-    const childCount = childFolderIds.length + pageIdsInFolder.length;
-    const message =
-      childCount > 0
-        ? `Delete folder "${folder.name}" and all its contents (${childCount} item${childCount > 1 ? "s" : ""})? This cannot be undone.`
-        : `Delete empty folder "${folder.name}"?`;
-    if (!window.confirm(message)) return;
+  const handleDelete = useCallback(() => {
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    setIsDeletingFolder(true);
     try {
       await folderStore.removeFolder(workspaceSlug, folderId);
+      setIsDeleteModalOpen(false);
     } catch (error) {
       console.error("Failed to delete folder:", error);
+      setToast({
+        type: TOAST_TYPE.ERROR,
+        title: "Error!",
+        message: "Folder could not be deleted. Please try again.",
+      });
+    } finally {
+      setIsDeletingFolder(false);
     }
-  }, [folderStore, workspaceSlug, folderId, childFolderIds.length, pageIdsInFolder.length, folder.name]);
+  }, [folderStore, workspaceSlug, folderId]);
 
   const handleNewSubFolder = useCallback(async () => {
     try {
@@ -237,6 +248,34 @@ export const FolderNode = observer(function FolderNode(props: Props) {
           canCreateSubFolder={canCreateSubFolder}
         />
       )}
+
+      {/* Delete confirmation modal */}
+      {(() => {
+        const childCount = childFolderIds.length + pageIdsInFolder.length;
+        const modalContent =
+          childCount > 0 ? (
+            <>
+              <span className="font-medium break-words text-primary">{folder.name}</span> and all its contents (
+              {childCount} {childCount === 1 ? "item" : "items"}) will be permanently deleted. This cannot be undone.
+            </>
+          ) : (
+            <>
+              <span className="font-medium break-words text-primary">{folder.name}</span> will be permanently deleted.
+              This cannot be undone.
+            </>
+          );
+        return (
+          <AlertModalCore
+            isOpen={isDeleteModalOpen}
+            handleClose={() => setIsDeleteModalOpen(false)}
+            handleSubmit={handleConfirmDelete}
+            isSubmitting={isDeletingFolder}
+            title="Delete folder"
+            content={modalContent}
+            primaryButtonText={{ loading: "Deleting...", default: "Delete" }}
+          />
+        );
+      })()}
 
       {/* Children (sub-folders + pages) */}
       {isExpanded && (
