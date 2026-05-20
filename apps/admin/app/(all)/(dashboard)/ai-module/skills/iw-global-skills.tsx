@@ -49,7 +49,7 @@ function SkillDrawerForm({
     setValue,
     watch,
     reset,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<TGlobalSkill>({
     defaultValues: initial ?? { slug: "", name: "", category: "", knowledge: "", is_active: true },
   });
@@ -74,25 +74,42 @@ function SkillDrawerForm({
   return (
     <form onSubmit={handleSubmit((data) => onSave(data, isNew))} className="space-y-6">
       <div className="flex flex-col gap-1">
-        <span className="text-13 text-tertiary">Name</span>
-        <Input {...register("name")} placeholder="Code Review" className="w-full rounded-md" />
+        <span className="text-13 text-tertiary">
+          Name <span className="text-red-500">*</span>
+        </span>
+        <Input
+          {...register("name", { required: "Name is required." })}
+          placeholder="Code Review"
+          className={`w-full rounded-md ${errors.name ? "border-red-500" : ""}`}
+        />
+        {errors.name && <p className="text-red-500 text-11">{errors.name.message}</p>}
       </div>
       <div className="flex flex-col gap-1">
-        <span className="text-13 text-tertiary">Slug</span>
-        <Input {...register("slug")} placeholder="code-review" className="font-mono w-full rounded-md" />
+        <span className="text-13 text-tertiary">
+          Slug <span className="text-red-500">*</span>
+        </span>
+        <Input
+          {...register("slug", { required: "Slug is required." })}
+          placeholder="code-review"
+          className={`font-mono w-full rounded-md ${errors.slug ? "border-red-500" : ""}`}
+        />
+        {errors.slug && <p className="text-red-500 text-11">{errors.slug.message}</p>}
       </div>
       <div className="flex flex-col gap-1">
         <span className="text-13 text-tertiary">Category</span>
         <Input {...register("category")} placeholder="engineering" className="w-full rounded-md" />
       </div>
       <div className="flex flex-col gap-1">
-        <span className="text-13 text-tertiary">Knowledge (injected into agent context)</span>
+        <span className="text-13 text-tertiary">
+          Knowledge (injected into agent context) <span className="text-red-500">*</span>
+        </span>
         <textarea
-          {...register("knowledge")}
+          {...register("knowledge", { required: "Knowledge is required." })}
           rows={10}
           placeholder="# Code Review Guidelines&#10;…"
-          className="focus:ring-accent-primary font-mono w-full resize-y rounded-md border border-subtle bg-layer-transparent p-3 text-body-xs-regular text-primary placeholder:text-placeholder focus:ring-1 focus:outline-none"
+          className={`focus:ring-accent-primary font-mono w-full resize-y rounded-md border bg-layer-transparent p-3 text-body-xs-regular text-primary placeholder:text-placeholder focus:ring-1 focus:outline-none ${errors.knowledge ? "border-red-500" : "border-subtle"}`}
         />
+        {errors.knowledge && <p className="text-red-500 text-11">{errors.knowledge.message}</p>}
       </div>
       <div className="flex items-center justify-between">
         <span className="text-body-sm-medium text-primary">Active</span>

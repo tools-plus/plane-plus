@@ -61,7 +61,7 @@ function MCPConnectionDrawerForm({
     watch,
     reset,
     control,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<TMCPConnection>({
     defaultValues: initial ?? {
       slug: "",
@@ -105,16 +105,37 @@ function MCPConnectionDrawerForm({
   return (
     <form onSubmit={handleSubmit((data) => onSave(data, isNew))} className="space-y-6">
       <div className="flex flex-col gap-1">
-        <span className="text-13 text-tertiary">Name</span>
-        <Input {...register("name")} placeholder="GitHub MCP" className="w-full rounded-md" />
+        <span className="text-13 text-tertiary">
+          Name <span className="text-red-500">*</span>
+        </span>
+        <Input
+          {...register("name", { required: "Name is required." })}
+          placeholder="GitHub MCP"
+          className={`w-full rounded-md ${errors.name ? "border-red-500" : ""}`}
+        />
+        {errors.name && <p className="text-red-500 text-11">{errors.name.message}</p>}
       </div>
       <div className="flex flex-col gap-1">
-        <span className="text-13 text-tertiary">Slug</span>
-        <Input {...register("slug")} placeholder="github-mcp" className="font-mono w-full rounded-md" />
+        <span className="text-13 text-tertiary">
+          Slug <span className="text-red-500">*</span>
+        </span>
+        <Input
+          {...register("slug", { required: "Slug is required." })}
+          placeholder="github-mcp"
+          className={`font-mono w-full rounded-md ${errors.slug ? "border-red-500" : ""}`}
+        />
+        {errors.slug && <p className="text-red-500 text-11">{errors.slug.message}</p>}
       </div>
       <div className="flex flex-col gap-1">
-        <span className="text-13 text-tertiary">Server URL</span>
-        <Input {...register("server_url")} placeholder="https://mcp.example.com/sse" className="w-full rounded-md" />
+        <span className="text-13 text-tertiary">
+          Server URL <span className="text-red-500">*</span>
+        </span>
+        <Input
+          {...register("server_url", { required: "Server URL is required." })}
+          placeholder="https://mcp.example.com/sse"
+          className={`w-full rounded-md ${errors.server_url ? "border-red-500" : ""}`}
+        />
+        {errors.server_url && <p className="text-red-500 text-11">{errors.server_url.message}</p>}
       </div>
 
       {/* Auth type */}
@@ -193,7 +214,7 @@ export function IWGlobalMCPConnections() {
 
   const loadData = useCallback(async () => {
     try {
-      const data = await apiFetch<TMCPConnection[]>("/mcp-connections/");
+      const data = await apiFetch<TMCPConnection[]>("/mcps/");
       setConnections(data);
     } catch {
       setToast({ type: TOAST_TYPE.ERROR, title: "Error", message: "Failed to load MCP connections." });
@@ -209,7 +230,7 @@ export function IWGlobalMCPConnections() {
   const handleDelete = async (slug: string) => {
     if (!window.confirm("Delete this MCP connection?")) return;
     try {
-      await apiFetch(`/mcp-connections/${slug}/`, { method: "DELETE" });
+      await apiFetch(`/mcps/${slug}/`, { method: "DELETE" });
       setConnections((prev) => prev.filter((c) => c.slug !== slug));
       setToast({ type: TOAST_TYPE.SUCCESS, title: "Deleted", message: "MCP connection deleted." });
     } catch {
@@ -220,14 +241,14 @@ export function IWGlobalMCPConnections() {
   const handleSave = async (data: TMCPConnection, isNew: boolean) => {
     try {
       if (isNew) {
-        const created = await apiFetch<TMCPConnection>("/mcp-connections/", {
+        const created = await apiFetch<TMCPConnection>("/mcps/", {
           method: "POST",
           body: JSON.stringify(data),
         });
         setConnections((prev) => [...prev, created]);
         setToast({ type: TOAST_TYPE.SUCCESS, title: "Created", message: "MCP connection created." });
       } else {
-        const updated = await apiFetch<TMCPConnection>(`/mcp-connections/${data.slug}/`, {
+        const updated = await apiFetch<TMCPConnection>(`/mcps/${data.slug}/`, {
           method: "PATCH",
           body: JSON.stringify(data),
         });

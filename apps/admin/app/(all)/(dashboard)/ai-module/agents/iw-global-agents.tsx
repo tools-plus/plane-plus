@@ -138,7 +138,7 @@ function AgentDrawerForm({
     setValue,
     watch,
     reset,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<TAgentForm>({ defaultValues: initial ?? AGENT_DEFAULTS });
 
   useEffect(() => {
@@ -182,25 +182,42 @@ function AgentDrawerForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Name */}
       <div className="flex flex-col gap-1">
-        <span className="text-13 text-tertiary">Name</span>
-        <Input {...register("name")} placeholder="My Global Agent" className="w-full rounded-md" />
+        <span className="text-13 text-tertiary">
+          Name <span className="text-red-500">*</span>
+        </span>
+        <Input
+          {...register("name", { required: "Name is required." })}
+          placeholder="My Global Agent"
+          className={`w-full rounded-md ${errors.name ? "border-red-500" : ""}`}
+        />
+        {errors.name && <p className="text-red-500 text-11">{errors.name.message}</p>}
       </div>
 
       {/* Slug */}
       <div className="flex flex-col gap-1">
-        <span className="text-13 text-tertiary">Slug</span>
-        <Input {...register("slug")} placeholder="my-global-agent" className="font-mono w-full rounded-md" />
+        <span className="text-13 text-tertiary">
+          Slug <span className="text-red-500">*</span>
+        </span>
+        <Input
+          {...register("slug", { required: "Slug is required." })}
+          placeholder="my-global-agent"
+          className={`font-mono w-full rounded-md ${errors.slug ? "border-red-500" : ""}`}
+        />
+        {errors.slug && <p className="text-red-500 text-11">{errors.slug.message}</p>}
       </div>
 
       {/* Instructions */}
       <div className="flex flex-col gap-1">
-        <span className="text-13 text-tertiary">Instructions (system prompt)</span>
+        <span className="text-13 text-tertiary">
+          Instructions (system prompt) <span className="text-red-500">*</span>
+        </span>
         <textarea
-          {...register("instructions")}
+          {...register("instructions", { required: "Instructions are required." })}
           rows={6}
           placeholder="You are a helpful assistant…"
-          className="focus:ring-accent-primary w-full resize-y rounded-md border border-subtle bg-layer-transparent p-3 text-body-xs-regular text-primary placeholder:text-placeholder focus:ring-1 focus:outline-none"
+          className={`focus:ring-accent-primary w-full resize-y rounded-md border bg-layer-transparent p-3 text-body-xs-regular text-primary placeholder:text-placeholder focus:ring-1 focus:outline-none ${errors.instructions ? "border-red-500" : "border-subtle"}`}
         />
+        {errors.instructions && <p className="text-red-500 text-11">{errors.instructions.message}</p>}
       </div>
 
       {/* Model preference */}
