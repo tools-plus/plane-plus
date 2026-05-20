@@ -32,6 +32,12 @@ services:
       POSTGRES_PASSWORD: plane
       POSTGRES_DB: plane
       PGDATA: /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U plane -d plane"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     networks:
       - iw-dev
 
@@ -106,8 +112,10 @@ services:
     env_file:
       - ./apps/api/.env
     depends_on:
-      - iw-db
-      - iw-redis
+      iw-db:
+        condition: service_healthy
+      iw-redis:
+        condition: service_started
     networks:
       - iw-dev
 
