@@ -93,6 +93,7 @@ INSTALLED_APPS = [
     "plane.license",
     "plane.api",
     "plane.iw",
+    "plane.ai",
     "plane.authentication",
     # Third-party things
     "rest_framework",
