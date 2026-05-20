@@ -17,6 +17,7 @@ from .iw_workspace_page import urlpatterns as iw_workspace_page_urls
 from .iw_epic import urlpatterns as iw_epic_urls
 from .iw_page_folder import urlpatterns as iw_page_folder_urls
 from .iw_agent_doc import urlpatterns as iw_agent_doc_urls
+from .iw_workspace_ai import urlpatterns as iw_workspace_ai_urls
 from .project import urlpatterns as project_urls
 from .search import urlpatterns as search_urls
 from .state import urlpatterns as state_urls
@@ -42,6 +43,7 @@ urlpatterns = [
     *iw_epic_urls,
     *iw_page_folder_urls,
     *iw_agent_doc_urls,
+    *iw_workspace_ai_urls,
     *project_urls,
     *search_urls,
     *state_urls,
