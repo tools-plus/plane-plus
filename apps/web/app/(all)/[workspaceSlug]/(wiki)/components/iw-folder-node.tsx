@@ -7,6 +7,7 @@ import { useCallback, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { runInAction } from "mobx";
 import { unset } from "lodash-es";
+import { useParams } from "react-router";
 import { ChevronRight, Folder, FolderOpen, MoreHorizontal } from "lucide-react";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import { AlertModalCore } from "@plane/ui";
@@ -53,6 +54,8 @@ export const FolderNode = observer(function FolderNode(props: Props) {
   const folderStore = usePageFolders();
   const wikiStore = usePageStore(EPageStoreType.WORKSPACE);
   const router = useAppRouter();
+  // Get active pageId directly from URL — more reliable than prop chain
+  const { pageId: activePageId } = useParams<{ pageId?: string }>();
   const folder = folderStore.folders[folderId];
   // observable.ref — reading the ref directly triggers MobX tracking
   const isExpanded = !!folderStore.expandedFolders[folderId];
@@ -165,7 +168,7 @@ export const FolderNode = observer(function FolderNode(props: Props) {
       });
 
       // If the currently viewed page was inside the deleted subtree, go to wiki home
-      if (currentPageId && pageIdsToDelete.includes(currentPageId)) {
+      if (activePageId && pageIdsToDelete.includes(activePageId)) {
         router.push(wikiBasePath);
       }
 
@@ -180,7 +183,7 @@ export const FolderNode = observer(function FolderNode(props: Props) {
     } finally {
       setIsDeletingFolder(false);
     }
-  }, [folderStore, wikiStore, router, workspaceSlug, folderId, currentPageId, wikiBasePath]);
+  }, [folderStore, wikiStore, router, workspaceSlug, folderId, activePageId, wikiBasePath]);
 
   const handleNewSubFolder = useCallback(async () => {
     try {
