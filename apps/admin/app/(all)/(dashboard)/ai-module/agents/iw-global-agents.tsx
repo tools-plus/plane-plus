@@ -14,7 +14,7 @@ type TGlobalAgent = {
   slug: string;
   name: string;
   instructions: string;
-  model_preference: string;
+  model_pref: string; // matches the Django field name
   default_monthly_budget: string;
   is_active: boolean;
   skills: string[];
@@ -52,7 +52,7 @@ function AgentRow({
     <tr className="border-b border-subtle hover:bg-layer-transparent-hover">
       <td className="px-4 py-3 text-body-sm-medium text-primary">{agent.name}</td>
       <td className="font-mono px-4 py-3 text-body-xs-regular text-secondary">{agent.slug}</td>
-      <td className="px-4 py-3 text-body-xs-regular text-secondary">{agent.model_preference || "—"}</td>
+      <td className="px-4 py-3 text-body-xs-regular text-secondary">{agent.model_pref || "—"}</td>
       <td className="px-4 py-3 text-body-xs-regular text-secondary">
         {agent.default_monthly_budget ? `$${agent.default_monthly_budget}` : "—"}
       </td>
@@ -91,11 +91,28 @@ function AgentRow({
 
 // ---- Drawer form ------------------------------------------------------------
 
-type TAgentForm = Omit<TGlobalAgent, "skills" | "tools" | "mcp_connections"> & {
-  skills: string[];
-  tools: string[];
-  mcp_connections: string[];
+const AGENT_DEFAULTS: TAgentForm = {
+  slug: "",
+  name: "",
+  instructions: "",
+  model_pref: "",
+  default_monthly_budget: "",
+  is_active: true,
+  skills: [],
+  tools: [],
+  mcp_connections: [],
 };
+
+async function testAgentModelCall(model: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetch("/api/god-mode/ai/litellm-config/test-model/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(model ? { model } : {}),
+  });
+  const body = (await res.json().catch(() => ({}))) as { detail?: string; reply?: string; model?: string };
+  if (!res.ok) return { success: false, message: body?.detail ?? "Model call failed" };
+  return { success: true, message: `Model replied (${body.model ?? "unknown"}): "${body.reply}"` };
+}
 
 function AgentDrawerForm({
   initial,
@@ -113,6 +130,9 @@ function AgentDrawerForm({
   onClose: () => void;
 }) {
   const isNew = !initial;
+  const [modelTestResult, setModelTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [isTestingModel, setIsTestingModel] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -120,34 +140,11 @@ function AgentDrawerForm({
     watch,
     reset,
     formState: { isSubmitting },
-  } = useForm<TAgentForm>({
-    defaultValues: initial ?? {
-      slug: "",
-      name: "",
-      instructions: "",
-      model_preference: "",
-      default_monthly_budget: "",
-      is_active: true,
-      skills: [],
-      tools: [],
-      mcp_connections: [],
-    },
-  });
+  } = useForm<TAgentForm>({ defaultValues: initial ?? AGENT_DEFAULTS });
 
   useEffect(() => {
-    reset(
-      initial ?? {
-        slug: "",
-        name: "",
-        instructions: "",
-        model_preference: "",
-        default_monthly_budget: "",
-        is_active: true,
-        skills: [],
-        tools: [],
-        mcp_connections: [],
-      }
-    );
+    reset(initial ?? AGENT_DEFAULTS);
+    setModelTestResult(null);
   }, [initial, reset]);
 
   const watchedName = watch("name");
@@ -211,7 +208,35 @@ function AgentDrawerForm({
       {/* Model preference */}
       <div className="flex flex-col gap-1">
         <span className="text-13 text-tertiary">Model preference</span>
-        <Input {...register("model_preference")} placeholder="claude-sonnet-4-5" className="w-full rounded-md" />
+        <p className="text-11 text-tertiary">LiteLLM model string, e.g. anthropic/claude-sonnet-4-5, openrouter/…</p>
+        <div className="flex gap-2">
+          <Input {...register("model_pref")} placeholder="anthropic/claude-sonnet-4-5" className="w-full rounded-md" />
+          <Button
+            type="button"
+            variant="secondary"
+            size="base"
+            loading={isTestingModel}
+            onClick={async () => {
+              const model = watch("model_pref");
+              if (!model) return;
+              setIsTestingModel(true);
+              setModelTestResult(null);
+              try {
+                const result = await testAgentModelCall(model);
+                setModelTestResult(result);
+              } finally {
+                setIsTestingModel(false);
+              }
+            }}
+          >
+            {isTestingModel ? "Testing…" : "Test"}
+          </Button>
+        </div>
+        {modelTestResult && (
+          <p className={`mt-1 text-11 ${modelTestResult.success ? "text-green-600" : "text-red-600"}`}>
+            {modelTestResult.message}
+          </p>
+        )}
       </div>
 
       {/* Budget */}
@@ -332,7 +357,7 @@ export function IWGlobalAgents() {
         apiFetch<TGlobalAgent[]>("/agents/"),
         apiFetch<TMultiSelectOption[]>("/skills/").catch(() => []),
         apiFetch<TMultiSelectOption[]>("/tools/").catch(() => []),
-        apiFetch<TMultiSelectOption[]>("/mcp-connections/").catch(() => []),
+        apiFetch<TMultiSelectOption[]>("/mcps/").catch(() => []),
       ]);
       setAgents(agentsData);
       setSkills(skillsData);
