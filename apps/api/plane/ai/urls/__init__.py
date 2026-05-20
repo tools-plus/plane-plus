@@ -1,2 +1,4 @@
 # InfraWatch — AI module URL packages
 # SPDX-License-Identifier: AGPL-3.0-only
+
+from .workspace import urlpatterns as workspace_urlpatterns  # noqa: F401
