@@ -103,15 +103,15 @@ const AGENT_DEFAULTS: TAgentForm = {
   mcp_connections: [],
 };
 
-async function testAgentModelCall(model: string): Promise<{ success: boolean; message: string }> {
+async function testAgentModelCall(model: string): Promise<{ success: boolean; reply?: string; error?: string }> {
   const res = await fetch("/api/god-mode/ai/litellm-config/test-model/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(model ? { model } : {}),
+    body: JSON.stringify({ model }),
   });
   const body = (await res.json().catch(() => ({}))) as { detail?: string; reply?: string; model?: string };
-  if (!res.ok) return { success: false, message: body?.detail ?? "Model call failed" };
-  return { success: true, message: `Model replied (${body.model ?? "unknown"}): "${body.reply}"` };
+  if (!res.ok) return { success: false, error: body?.detail ?? "Model call failed" };
+  return { success: true, reply: body.reply ?? "" };
 }
 
 function AgentDrawerForm({
@@ -130,7 +130,6 @@ function AgentDrawerForm({
   onClose: () => void;
 }) {
   const isNew = !initial;
-  const [modelTestResult, setModelTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [isTestingModel, setIsTestingModel] = useState(false);
 
   const {
@@ -144,7 +143,6 @@ function AgentDrawerForm({
 
   useEffect(() => {
     reset(initial ?? AGENT_DEFAULTS);
-    setModelTestResult(null);
   }, [initial, reset]);
 
   const watchedName = watch("name");
@@ -220,10 +218,23 @@ function AgentDrawerForm({
               const model = watch("model_pref");
               if (!model) return;
               setIsTestingModel(true);
-              setModelTestResult(null);
               try {
                 const result = await testAgentModelCall(model);
-                setModelTestResult(result);
+                if (result.success) {
+                  setToast({
+                    type: TOAST_TYPE.SUCCESS,
+                    title: "Model reachable",
+                    message: result.reply ? `Reply: "${result.reply}"` : "Model responded successfully.",
+                  });
+                } else {
+                  setToast({
+                    type: TOAST_TYPE.ERROR,
+                    title: "Model call failed",
+                    message: result.error ?? "Unknown error",
+                  });
+                }
+              } catch {
+                setToast({ type: TOAST_TYPE.ERROR, title: "Error", message: "An unexpected error occurred." });
               } finally {
                 setIsTestingModel(false);
               }
@@ -232,11 +243,6 @@ function AgentDrawerForm({
             {isTestingModel ? "Testing…" : "Test"}
           </Button>
         </div>
-        {modelTestResult && (
-          <p className={`mt-1 text-11 ${modelTestResult.success ? "text-green-600" : "text-red-600"}`}>
-            {modelTestResult.message}
-          </p>
-        )}
       </div>
 
       {/* Budget */}
