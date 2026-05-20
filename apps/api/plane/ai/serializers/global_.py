@@ -13,6 +13,11 @@ from plane.ai.models import (
 
 
 class LiteLLMConfigSerializer(serializers.ModelSerializer):
+    # Override URLField → CharField so Django's strict URL validator doesn't
+    # reject internal Docker/k8s hostnames like http://plane-litellm:4000.
+    # DRF does not call model.full_clean(), so the model-level URLField
+    # constraint is bypassed gracefully.
+    endpoint = serializers.CharField(max_length=500, required=False)
     master_key = serializers.CharField(write_only=True, required=False)
 
     class Meta:
