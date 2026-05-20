@@ -6,6 +6,7 @@
 
 // local imports
 import { coreSidebarMenuLinks } from "./core";
+import { iwSidebarMenuLinks } from "./iw-core";
 import type { TSidebarMenuItem } from "./types";
 
 export function useSidebarMenu(): TSidebarMenuItem[] {
@@ -16,5 +17,6 @@ export function useSidebarMenu(): TSidebarMenuItem[] {
     coreSidebarMenuLinks.workspace,
     coreSidebarMenuLinks.ai,
     coreSidebarMenuLinks.image,
+    iwSidebarMenuLinks.aiModule,
   ];
 }
