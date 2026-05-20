@@ -18,7 +18,7 @@ export type TLiteLLMConfig = {
   endpoint: string;
   master_key: string;
   provider: TLiteLLMProvider;
-  model_routing: string; // JSON string
+  model_routing: string; // JSON string in the form, dict on the wire
   default_workspace_budget: string;
   max_workspace_budget: string;
   default_agent_budget: string;
@@ -70,7 +70,6 @@ async function testLiteLLMConnection(): Promise<{ success: boolean; message: str
 
 export function IWLiteLLMConfig() {
   const [isLoading, setIsLoading] = useState(true);
-  const [notConfigured, setNotConfigured] = useState(false);
   const [modelRoutingExpanded, setModelRoutingExpanded] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [isTesting, setIsTesting] = useState(false);
@@ -79,18 +78,20 @@ export function IWLiteLLMConfig() {
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<TLiteLLMConfig>({ defaultValues: DEFAULT_VALUES });
+
+  const isActive = watch("is_active");
 
   // Load config on mount
   useEffect(() => {
     fetchLiteLLMConfig()
       .then((config) => {
-        if (!config) {
-          setNotConfigured(true);
-        } else {
+        if (config) {
           reset({ ...config, master_key: "" }); // master_key not returned on GET
         }
+        // No config yet → form stays at DEFAULT_VALUES (is_active: false)
       })
       .catch(() =>
         setToast({ type: TOAST_TYPE.ERROR, title: "Error", message: "Failed to load LiteLLM configuration." })
@@ -101,7 +102,6 @@ export function IWLiteLLMConfig() {
   const onSubmit = async (formData: TLiteLLMConfig) => {
     try {
       await saveLiteLLMConfig(formData);
-      setNotConfigured(false);
       setToast({ type: TOAST_TYPE.SUCCESS, title: "Saved", message: "LiteLLM configuration updated." });
     } catch {
       setToast({ type: TOAST_TYPE.ERROR, title: "Error", message: "Failed to save LiteLLM configuration." });
@@ -132,115 +132,15 @@ export function IWLiteLLMConfig() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl space-y-8">
-      {notConfigured && (
-        <div className="rounded-md border border-subtle bg-layer-transparent-hover px-4 py-3 text-body-sm-regular text-secondary">
-          No LiteLLM configuration found. Fill in the details below to get started.
-        </div>
-      )}
-
-      {/* Core connection fields */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <ControllerInput
-          control={control}
-          type="text"
-          name="endpoint"
-          label="Endpoint"
-          placeholder="http://plane-litellm:4000"
-          error={Boolean(errors.endpoint)}
-          required={false}
-        />
-        <ControllerInput
-          control={control}
-          type="password"
-          name="master_key"
-          label="Master Key"
-          placeholder="sk-••••••••"
-          error={Boolean(errors.master_key)}
-          required={false}
-        />
-      </div>
-
-      {/* Provider — free text, any LiteLLM-supported provider slug */}
-      <div className="flex max-w-xs flex-col gap-1">
-        <h4 className="text-13 text-tertiary">Provider</h4>
-        <p className="text-11 text-tertiary">Any LiteLLM provider slug (e.g. anthropic, openai, bedrock, ollama)</p>
-        <Controller
-          control={control}
-          name="provider"
-          render={({ field }) => <Input {...field} placeholder="anthropic" className="rounded-md border-subtle" />}
-        />
-      </div>
-
-      {/* Budget fields */}
-      <div>
-        <div className="pb-3 text-body-sm-medium text-primary">Budget limits ($/month)</div>
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {(
-            [
-              { name: "default_workspace_budget", label: "Default workspace budget" },
-              { name: "max_workspace_budget", label: "Max workspace budget" },
-              { name: "default_agent_budget", label: "Default agent budget" },
-              { name: "max_agent_budget", label: "Max agent budget" },
-            ] as const
-          ).map((f) => (
-            <div key={f.name} className="flex flex-col gap-1">
-              <h4 className="text-13 text-tertiary">{f.label}</h4>
-              <Controller
-                control={control}
-                name={f.name}
-                render={({ field }) => (
-                  <Input
-                    type="number"
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="0.00"
-                    className="w-full rounded-md font-medium"
-                    min="0"
-                    step="0.01"
-                  />
-                )}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Model Routing — collapsible */}
-      <div className="space-y-2">
-        <button
-          type="button"
-          className="flex items-center gap-2 text-body-sm-medium text-primary"
-          onClick={() => setModelRoutingExpanded((prev) => !prev)}
-        >
-          {modelRoutingExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-          Model Routing (advanced)
-        </button>
-        {modelRoutingExpanded && (
-          <div className="flex flex-col gap-1">
-            <p className="text-11 text-tertiary">Paste a JSON model routing config.</p>
-            <Controller
-              control={control}
-              name="model_routing"
-              render={({ field }) => (
-                <textarea
-                  value={field.value}
-                  onChange={field.onChange}
-                  rows={8}
-                  placeholder='{"model_list": []}'
-                  className="font-mono focus:ring-accent-primary w-full resize-y rounded-md border border-subtle bg-layer-transparent p-3 text-body-xs-regular text-primary placeholder:text-placeholder focus:ring-1 focus:outline-none"
-                />
-              )}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Active toggle */}
-      <div className="flex items-center gap-4">
-        <div className="grow">
-          <div className="text-body-sm-medium text-primary">Active</div>
-          <div className="text-11 text-tertiary">Enable LiteLLM integration for all workspaces.</div>
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl">
+      {/* ── Header: title + enable toggle ─────────────────────────────────── */}
+      <div className="flex items-start justify-between gap-8 pb-4">
+        <div>
+          <h3 className="text-body-lg-semibold text-primary">LiteLLM AI Gateway</h3>
+          <p className="mt-1 text-body-sm-regular text-secondary">
+            Connect Plane to a LiteLLM proxy to power AI features across workspaces. When disabled, workspace AI
+            settings will not be shown to workspace admins.
+          </p>
         </div>
         <Controller
           control={control}
@@ -249,28 +149,134 @@ export function IWLiteLLMConfig() {
         />
       </div>
 
-      {/* Test connection result */}
-      {testResult && (
-        <div
-          className={cn(
-            "rounded-md border px-4 py-2 text-body-sm-regular",
-            testResult.success
-              ? "border-green-500/30 bg-green-500/10 text-green-600"
-              : "border-red-500/30 bg-red-500/10 text-red-600"
+      <div className="border-t border-subtle" />
+
+      {/* ── Form fields — only shown when the gateway is enabled ──────────── */}
+      {isActive && (
+        <div className="mt-6 space-y-8">
+          {/* Core connection fields */}
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <ControllerInput
+              control={control}
+              type="text"
+              name="endpoint"
+              label="Endpoint"
+              placeholder="http://plane-litellm:4000"
+              error={Boolean(errors.endpoint)}
+              required={false}
+            />
+            <ControllerInput
+              control={control}
+              type="password"
+              name="master_key"
+              label="Master Key"
+              placeholder="sk-••••••••"
+              error={Boolean(errors.master_key)}
+              required={false}
+            />
+          </div>
+
+          {/* Provider — free text, any LiteLLM-supported provider slug */}
+          <div className="flex max-w-xs flex-col gap-1">
+            <h4 className="text-13 text-tertiary">Provider</h4>
+            <p className="text-11 text-tertiary">Any LiteLLM provider slug (e.g. anthropic, openai, bedrock, ollama)</p>
+            <Controller
+              control={control}
+              name="provider"
+              render={({ field }) => <Input {...field} placeholder="anthropic" className="rounded-md border-subtle" />}
+            />
+          </div>
+
+          {/* Budget fields */}
+          <div>
+            <div className="pb-3 text-body-sm-medium text-primary">Budget limits ($/month)</div>
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+              {(
+                [
+                  { name: "default_workspace_budget", label: "Default workspace budget" },
+                  { name: "max_workspace_budget", label: "Max workspace budget" },
+                  { name: "default_agent_budget", label: "Default agent budget" },
+                  { name: "max_agent_budget", label: "Max agent budget" },
+                ] as const
+              ).map((f) => (
+                <div key={f.name} className="flex flex-col gap-1">
+                  <h4 className="text-13 text-tertiary">{f.label}</h4>
+                  <Controller
+                    control={control}
+                    name={f.name}
+                    render={({ field }) => (
+                      <Input
+                        type="number"
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="0.00"
+                        className="w-full rounded-md font-medium"
+                        min="0"
+                        step="0.01"
+                      />
+                    )}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Model Routing — collapsible */}
+          <div className="space-y-2">
+            <button
+              type="button"
+              className="flex items-center gap-2 text-body-sm-medium text-primary"
+              onClick={() => setModelRoutingExpanded((prev) => !prev)}
+            >
+              {modelRoutingExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              Model Routing (advanced)
+            </button>
+            {modelRoutingExpanded && (
+              <div className="flex flex-col gap-1">
+                <p className="text-11 text-tertiary">Paste a JSON model routing config.</p>
+                <Controller
+                  control={control}
+                  name="model_routing"
+                  render={({ field }) => (
+                    <textarea
+                      value={field.value}
+                      onChange={field.onChange}
+                      rows={8}
+                      placeholder='{"model_list": []}'
+                      className="font-mono focus:ring-accent-primary w-full resize-y rounded-md border border-subtle bg-layer-transparent p-3 text-body-xs-regular text-primary placeholder:text-placeholder focus:ring-1 focus:outline-none"
+                    />
+                  )}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Test connection result */}
+          {testResult && (
+            <div
+              className={cn(
+                "rounded-md border px-4 py-2 text-body-sm-regular",
+                testResult.success
+                  ? "border-green-500/30 bg-green-500/10 text-green-600"
+                  : "border-red-500/30 bg-red-500/10 text-red-600"
+              )}
+            >
+              {testResult.message}
+            </div>
           )}
-        >
-          {testResult.message}
         </div>
       )}
 
-      {/* Actions */}
-      <div className="flex items-center gap-4">
-        <Button type="submit" variant="primary" size="lg" loading={isSubmitting} disabled={!isDirty && !notConfigured}>
-          {isSubmitting ? "Saving…" : "Save"}
+      {/* ── Actions ───────────────────────────────────────────────────────── */}
+      <div className={cn("flex items-center gap-4", isActive ? "mt-8" : "mt-6")}>
+        <Button type="submit" variant="primary" size="lg" loading={isSubmitting} disabled={!isDirty}>
+          {isSubmitting ? "Saving…" : "Save changes"}
         </Button>
-        <Button type="button" variant="secondary" size="lg" loading={isTesting} onClick={handleTestConnection}>
-          {isTesting ? "Testing…" : "Test Connection"}
-        </Button>
+        {isActive && (
+          <Button type="button" variant="secondary" size="lg" loading={isTesting} onClick={handleTestConnection}>
+            {isTesting ? "Testing…" : "Test connection"}
+          </Button>
+        )}
       </div>
     </form>
   );

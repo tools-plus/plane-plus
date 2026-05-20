@@ -1,6 +1,8 @@
 # InfraWatch — God-mode REST API for AI module global entities
 # SPDX-License-Identifier: AGPL-3.0-only
 
+import json as json_lib
+
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -34,6 +36,47 @@ class LiteLLMConfigEndpoint(BaseAPIView):
 
     permission_classes = [InstanceAdminPermission]
 
+    # Budget fields sent as empty strings from the form → remove so model defaults apply.
+    _BUDGET_FIELDS = (
+        "default_workspace_budget",
+        "max_workspace_budget",
+        "default_agent_budget",
+        "max_agent_budget",
+    )
+
+    def _clean_data(self, raw, is_create: bool) -> dict:
+        """
+        Sanitize incoming form data before passing to the serializer:
+
+        - Empty budget strings → omitted (model defaults on create; no-op on update)
+        - Empty master_key on update → omitted (retain stored value)
+        - model_routing string → parsed to dict; empty string → {}
+        """
+        data = dict(raw)
+
+        # Budget fields: DRF's DecimalField rejects "" — strip it
+        for field in self._BUDGET_FIELDS:
+            if data.get(field) == "":
+                data.pop(field, None)
+
+        # master_key: "" on update means "don't change"
+        if not is_create and data.get("master_key") == "":
+            data.pop("master_key", None)
+
+        # model_routing: textarea sends a JSON string; JSONField expects a dict
+        routing = data.get("model_routing")
+        if isinstance(routing, str):
+            routing = routing.strip()
+            if routing == "":
+                data["model_routing"] = {}
+            else:
+                try:
+                    data["model_routing"] = json_lib.loads(routing)
+                except (json_lib.JSONDecodeError, ValueError):
+                    data["model_routing"] = {}
+
+        return data
+
     def get(self, request):
         config = LiteLLMConfig.objects.first()
         if config is None:
@@ -47,10 +90,12 @@ class LiteLLMConfigEndpoint(BaseAPIView):
     def patch(self, request):
         config = LiteLLMConfig.objects.first()
         if config is None:
-            # Create on first PATCH if missing
-            serializer = LiteLLMConfigSerializer(data=request.data)
+            # First save — create a new record
+            cleaned = self._clean_data(request.data, is_create=True)
+            serializer = LiteLLMConfigSerializer(data=cleaned)
         else:
-            serializer = LiteLLMConfigSerializer(config, data=request.data, partial=True)
+            cleaned = self._clean_data(request.data, is_create=False)
+            serializer = LiteLLMConfigSerializer(config, data=cleaned, partial=True)
 
         if serializer.is_valid():
             serializer.save()
@@ -64,17 +109,17 @@ class LiteLLMConfigTestConnectionEndpoint(BaseAPIView):
     permission_classes = [InstanceAdminPermission]
 
     def post(self, request):
-        config = LiteLLMConfig.objects.filter(is_active=True).first()
+        config = LiteLLMConfig.objects.first()
         if config is None:
             return Response(
-                {"status": "error", "detail": "LiteLLM not configured."},
+                {"detail": "LiteLLM not configured yet. Save the configuration first."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         client = LiteLLMClient(config.endpoint, config.master_key)
         if client.health_check():
             return Response({"status": "ok"}, status=status.HTTP_200_OK)
         return Response(
-            {"status": "error", "detail": "Cannot reach LiteLLM endpoint."},
+            {"detail": "Cannot reach LiteLLM endpoint. Check the endpoint URL and master key."},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
 
