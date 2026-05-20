@@ -47,17 +47,19 @@ class WorkspacePagePermission(BasePermission):
         if request.method in ["POST", "PUT", "PATCH"]:
             return True
 
-        # DELETE — only page owner or workspace admin
-        if request.method == "DELETE" and page_id:
-            page = Page.objects.filter(
-                pk=page_id, workspace__slug=slug, is_global=True
-            ).first()
-            if page is None:
-                return False
-            if page.owned_by_id == request.user.id:
-                return True
-            if membership == ADMIN:
-                return True
-            return False
+        if request.method == "DELETE":
+            # Page delete — only the owner or a workspace admin
+            if page_id:
+                page = Page.objects.filter(
+                    pk=page_id, workspace__slug=slug, is_global=True
+                ).first()
+                if page is None:
+                    return False
+                if page.owned_by_id == request.user.id:
+                    return True
+                return membership == ADMIN
+
+            # Folder delete — folders have no ownership; any member or admin can delete
+            return membership in [MEMBER, ADMIN]
 
         return False

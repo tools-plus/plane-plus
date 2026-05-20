@@ -18,7 +18,7 @@ export type TPagesPersonalizationConfig = {
 };
 
 const DEFAULT_PERSONALIZATION_VALUES: TPagesPersonalizationConfig = {
-  full_width: false,
+  full_width: true,
   font_size: "large-font",
   font_style: "sans-serif",
   sticky_toolbar: true,

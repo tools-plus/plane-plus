@@ -3,12 +3,19 @@
  * Supports expand/collapse, drag-and-drop (as drop target), context menu, and inline rename.
  */
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
+import { runInAction } from "mobx";
+import { unset } from "lodash-es";
+import { useParams } from "react-router";
 import { ChevronRight, Folder, FolderOpen, MoreHorizontal } from "lucide-react";
+import { TOAST_TYPE, setToast } from "@plane/propel/toast";
+import { AlertModalCore } from "@plane/ui";
 import { cn } from "@plane/utils";
 // hooks
 import { usePageFolders } from "@/hooks/store/use-page-folders";
+import { EPageStoreType, usePageStore } from "@/plane-web/hooks/store";
+import { useAppRouter } from "@/hooks/use-app-router";
 // local components
 import { FolderContextMenu } from "./iw-folder-context-menu";
 import { WikiPageNode } from "./iw-page-node";
@@ -25,9 +32,14 @@ type Props = {
   dragOverFolderId: string | null;
   currentPageId?: string;
   allPagesList: Array<{ id?: string | null; name?: string; logo_props?: Record<string, unknown> }>;
+  autoRename?: boolean;
+  onAutoRenameComplete?: () => void;
 };
 
-const MAX_DEPTH = 4;
+// Store counts from 1 (root=1). MAX_NESTING_DEPTH in store = 4.
+// Component counts from 0 (root=0). Component depth 3 = store depth 4 = max allowed.
+// Hide "New Sub Folder" at component depth 3 so users can't attempt what the store blocks.
+const MAX_DEPTH = 3;
 
 export const FolderNode = observer(function FolderNode(props: Props) {
   const {
@@ -42,9 +54,15 @@ export const FolderNode = observer(function FolderNode(props: Props) {
     dragOverFolderId,
     currentPageId,
     allPagesList,
+    autoRename = false,
+    onAutoRenameComplete,
   } = props;
 
   const folderStore = usePageFolders();
+  const wikiStore = usePageStore(EPageStoreType.WORKSPACE);
+  const router = useAppRouter();
+  // Get active pageId directly from URL — more reliable than prop chain
+  const { pageId: activePageId } = useParams<{ pageId?: string }>();
   const folder = folderStore.folders[folderId];
   // observable.ref — reading the ref directly triggers MobX tracking
   const isExpanded = !!folderStore.expandedFolders[folderId];
@@ -60,7 +78,24 @@ export const FolderNode = observer(function FolderNode(props: Props) {
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState("");
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeletingFolder, setIsDeletingFolder] = useState(false);
+  const [newSubFolderId, setNewSubFolderId] = useState<string | null>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-enter rename mode when autoRename flips to true (fires after store update + state update)
+  useEffect(() => {
+    if (!autoRename) return;
+    setRenameValue(folder.name);
+    setIsRenaming(true);
+    setTimeout(() => {
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+      onAutoRenameComplete?.();
+    }, 50);
+    // folder.name and onAutoRenameComplete intentionally excluded — one-shot on autoRename flip
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRename]);
 
   // Pages in this folder, sorted alphabetically
   const pagesInFolder = allPagesList
@@ -97,7 +132,10 @@ export const FolderNode = observer(function FolderNode(props: Props) {
   const handleStartRename = () => {
     setRenameValue(folder.name);
     setIsRenaming(true);
-    setTimeout(() => renameInputRef.current?.focus(), 50);
+    setTimeout(() => {
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+    }, 50);
   };
 
   const handleFinishRename = useCallback(async () => {
@@ -120,27 +158,66 @@ export const FolderNode = observer(function FolderNode(props: Props) {
     }
   };
 
-  const handleDelete = useCallback(async () => {
-    const childCount = childFolderIds.length + pageIdsInFolder.length;
-    const message =
-      childCount > 0
-        ? `Delete folder "${folder.name}" and all its contents (${childCount} item${childCount > 1 ? "s" : ""})? This cannot be undone.`
-        : `Delete empty folder "${folder.name}"?`;
-    if (!window.confirm(message)) return;
+  const handleDelete = useCallback(() => {
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    setIsDeletingFolder(true);
     try {
+      // Collect entire subtree of folder IDs BEFORE deletion (BFS)
+      const toDelete = new Set<string>();
+      const queue = [folderId];
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        toDelete.add(current);
+        for (const f of Object.values(folderStore.folders)) {
+          if (f.parent_folder === current) queue.push(f.id);
+        }
+      }
+
+      // Collect page IDs whose folder is in the subtree — read directly from wikiStore.data
+      // so we don't depend on pageFolderMap being in sync
+      const pageIdsToDelete = Object.values(wikiStore.data)
+        .filter((p) => p && toDelete.has((p as unknown as { folder?: string }).folder ?? ""))
+        .map((p) => (p as unknown as { id: string }).id)
+        .filter(Boolean);
+
       await folderStore.removeFolder(workspaceSlug, folderId);
+
+      // Synchronously evict pages from wikiStore so sidebar updates immediately
+      runInAction(() => {
+        for (const pageId of pageIdsToDelete) {
+          unset(wikiStore.data, pageId);
+        }
+      });
+
+      // If the currently viewed page was inside the deleted subtree, go to wiki home
+      if (activePageId && pageIdsToDelete.includes(activePageId)) {
+        router.push(wikiBasePath);
+      }
+
+      setIsDeleteModalOpen(false);
     } catch (error) {
       console.error("Failed to delete folder:", error);
+      setToast({
+        type: TOAST_TYPE.ERROR,
+        title: "Error!",
+        message: "Folder could not be deleted. Please try again.",
+      });
+    } finally {
+      setIsDeletingFolder(false);
     }
-  }, [folderStore, workspaceSlug, folderId, childFolderIds.length, pageIdsInFolder.length, folder.name]);
+  }, [folderStore, wikiStore, router, workspaceSlug, folderId, activePageId, wikiBasePath]);
 
   const handleNewSubFolder = useCallback(async () => {
     try {
-      await folderStore.createFolder(workspaceSlug, {
+      const newFolder = await folderStore.createFolder(workspaceSlug, {
         name: "New Folder",
         parent_folder: folderId,
       });
       folderStore.setFolderExpanded(folderId, true);
+      setNewSubFolderId(newFolder.id);
     } catch (error) {
       console.error("Failed to create sub-folder:", error);
     }
@@ -158,6 +235,7 @@ export const FolderNode = observer(function FolderNode(props: Props) {
         role="treeitem"
         aria-expanded={isExpanded}
         tabIndex={0}
+        draggable
         style={{ paddingLeft: `${indentPx}px` }}
         className={cn(
           "group flex w-full cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 hover:bg-layer-transparent-hover",
@@ -168,6 +246,11 @@ export const FolderNode = observer(function FolderNode(props: Props) {
           if (e.key === "Enter") handleToggle(e as unknown as React.MouseEvent);
         }}
         onContextMenu={handleContextMenu}
+        onDragStart={(e) => {
+          e.stopPropagation();
+          e.dataTransfer.setData("application/x-wiki-folder-id", folderId);
+          e.dataTransfer.effectAllowed = "move";
+        }}
         onDragOver={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -238,6 +321,34 @@ export const FolderNode = observer(function FolderNode(props: Props) {
         />
       )}
 
+      {/* Delete confirmation modal */}
+      {(() => {
+        const childCount = childFolderIds.length + pageIdsInFolder.length;
+        const modalContent =
+          childCount > 0 ? (
+            <>
+              <span className="font-medium break-words text-primary">{folder.name}</span> and all its contents (
+              {childCount} {childCount === 1 ? "item" : "items"}) will be permanently deleted. This cannot be undone.
+            </>
+          ) : (
+            <>
+              <span className="font-medium break-words text-primary">{folder.name}</span> will be permanently deleted.
+              This cannot be undone.
+            </>
+          );
+        return (
+          <AlertModalCore
+            isOpen={isDeleteModalOpen}
+            handleClose={() => setIsDeleteModalOpen(false)}
+            handleSubmit={handleConfirmDelete}
+            isSubmitting={isDeletingFolder}
+            title="Delete folder"
+            content={modalContent}
+            primaryButtonText={{ loading: "Deleting...", default: "Delete" }}
+          />
+        );
+      })()}
+
       {/* Children (sub-folders + pages) */}
       {isExpanded && (
         <div>
@@ -256,6 +367,8 @@ export const FolderNode = observer(function FolderNode(props: Props) {
               dragOverFolderId={dragOverFolderId}
               currentPageId={currentPageId}
               allPagesList={allPagesList}
+              autoRename={childId === newSubFolderId}
+              onAutoRenameComplete={() => setNewSubFolderId(null)}
             />
           ))}
 

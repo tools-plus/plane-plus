@@ -64,7 +64,7 @@ export interface IPageFolderStore {
   syncPageFolderMap: (pages: Array<{ id?: string | null; folder?: string | null }>) => void;
   createFolder: (workspaceSlug: string, payload: TPageFolderCreatePayload) => Promise<TPageFolder>;
   updateFolder: (workspaceSlug: string, folderId: string, payload: TPageFolderUpdatePayload) => Promise<TPageFolder>;
-  removeFolder: (workspaceSlug: string, folderId: string) => Promise<void>;
+  removeFolder: (workspaceSlug: string, folderId: string) => Promise<string[]>;
   movePageToFolder: (workspaceSlug: string, pageId: string, folderId: string | null) => Promise<void>;
   removePageFromMap: (pageId: string) => void;
 }
@@ -291,32 +291,47 @@ export class PageFolderStore implements IPageFolderStore {
   /**
    * Delete a folder. Backend promotes children to parent and unsets pages.
    */
-  removeFolder = async (workspaceSlug: string, folderId: string): Promise<void> => {
+  removeFolder = async (workspaceSlug: string, folderId: string): Promise<string[]> => {
     const folder = this.folders[folderId];
-    if (!folder) return;
+    if (!folder) return [];
 
     await this.service.remove(workspaceSlug, folderId);
+
+    const deletedPageIds: string[] = [];
+
     runInAction(() => {
-      // Promote sub-folders to the deleted folder's parent (mirrors backend)
-      for (const f of Object.values(this.folders)) {
-        if (f.parent_folder === folderId) {
-          f.parent_folder = folder.parent_folder;
+      // Collect the entire subtree of folder IDs to remove (BFS — mirrors backend)
+      const toDelete = new Set<string>();
+      const queue = [folderId];
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        toDelete.add(current);
+        for (const f of Object.values(this.folders)) {
+          if (f.parent_folder === current) queue.push(f.id);
         }
       }
-      // Promote pages in this folder to root (mirrors backend)
+
+      // Remove all pages that belonged to any folder in the subtree
       const nextMap = { ...this.pageFolderMap };
       for (const [pageId, mappedFolderId] of Object.entries(nextMap)) {
-        if (mappedFolderId === folderId) {
+        if (toDelete.has(mappedFolderId)) {
+          deletedPageIds.push(pageId);
           delete nextMap[pageId];
         }
       }
       this.pageFolderMap = nextMap;
-      unset(this.folders, folderId);
-      // Remove from expanded state
-      const { [folderId]: _, ...rest } = this.expandedFolders;
-      this.expandedFolders = rest;
-      saveExpandedState(rest);
+
+      // Remove all folders in the subtree
+      for (const id of toDelete) unset(this.folders, id);
+
+      // Remove all from expanded state
+      const nextExpanded = { ...this.expandedFolders };
+      for (const id of toDelete) delete nextExpanded[id];
+      this.expandedFolders = nextExpanded;
+      saveExpandedState(nextExpanded);
     });
+
+    return deletedPageIds;
   };
 
   /**

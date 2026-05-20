@@ -23,7 +23,7 @@ import { usePageOperations } from "@/hooks/use-page-operations";
 // plane web components
 import { MovePageModal } from "@/plane-web/components/pages";
 // plane web hooks
-import type { EPageStoreType } from "@/plane-web/hooks/store";
+import { EPageStoreType } from "@/plane-web/hooks/store";
 import { usePageFlag } from "@/plane-web/hooks/use-page-flag";
 // store types
 import type { TPageInstance } from "@/store/pages/base-page";
@@ -139,7 +139,7 @@ export const PageActions = observer(function PageActions(props: Props) {
           },
           title: "Delete",
           icon: TrashIcon,
-          shouldRender: canCurrentUserDeletePage && !!archived_at,
+          shouldRender: canCurrentUserDeletePage && (!!archived_at || storeType === EPageStoreType.WORKSPACE),
         },
         {
           key: "move",
@@ -167,6 +167,7 @@ export const PageActions = observer(function PageActions(props: Props) {
       canCurrentUserMovePage,
       isMovePageEnabled,
       pageOperations,
+      storeType,
     ]
   );
   // arrange options
@@ -197,7 +198,7 @@ export const PageActions = observer(function PageActions(props: Props) {
               onClick={() => {
                 item.action?.();
               }}
-              className={cn("flex items-center gap-2", item.className)}
+              className={cn("flex items-center gap-2 rounded-none", item.className)}
               disabled={item.disabled}
             >
               {item.customContent ?? (

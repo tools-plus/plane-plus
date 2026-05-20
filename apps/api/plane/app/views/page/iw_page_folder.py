@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from plane.app.serializers import PageFolderSerializer
-from plane.db.models import PageFolder, Workspace
+from plane.db.models import PageFolder, Page, Workspace
 from plane.app.permissions import WorkspacePagePermission
 
 from ..base import BaseViewSet
@@ -84,13 +84,21 @@ class PageFolderViewSet(BaseViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        # Promote child folders to the deleted folder's parent
-        PageFolder.objects.filter(
-            parent_folder=folder
-        ).update(parent_folder=folder.parent_folder)
+        # Recursively collect all descendant folder IDs (breadth-first)
+        all_folder_ids = []
+        queue = [folder.id]
+        while queue:
+            current_id = queue.pop(0)
+            all_folder_ids.append(current_id)
+            children = PageFolder.objects.filter(
+                parent_folder_id=current_id
+            ).values_list("id", flat=True)
+            queue.extend(children)
 
-        # Unset folder on pages in this folder (move them to root)
-        folder.pages.update(folder=None)
+        # Delete all pages in the entire subtree
+        Page.objects.filter(folder__in=all_folder_ids).delete()
 
-        folder.delete()
+        # Delete all folders in the subtree (deepest first avoids FK issues)
+        PageFolder.objects.filter(id__in=all_folder_ids).delete()
+
         return Response(status=status.HTTP_204_NO_CONTENT)
