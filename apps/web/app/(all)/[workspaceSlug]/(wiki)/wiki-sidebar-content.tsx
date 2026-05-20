@@ -161,21 +161,43 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
   }, []);
 
   const handleDrop = useCallback(
-    async (e: React.DragEvent, folderId: string) => {
+    async (e: React.DragEvent, targetFolderId: string) => {
       e.preventDefault();
       setDragOverFolderId(null);
+      if (!slug) return;
+
       const pageId = e.dataTransfer.getData("application/x-wiki-page-id");
-      if (!pageId || !slug) return;
-      try {
-        await folderStore.movePageToFolder(slug, pageId, folderId);
-      } catch (error) {
-        console.error("Failed to move page to folder:", error);
+      const draggedFolderId = e.dataTransfer.getData("application/x-wiki-folder-id");
+
+      if (pageId) {
+        try {
+          await folderStore.movePageToFolder(slug, pageId, targetFolderId);
+        } catch (error) {
+          console.error("Failed to move page to folder:", error);
+        }
+      } else if (draggedFolderId && draggedFolderId !== targetFolderId) {
+        // Guard: prevent dropping a folder into its own descendant
+        const descendants = new Set<string>();
+        const queue = [draggedFolderId];
+        while (queue.length > 0) {
+          const cur = queue.shift()!;
+          descendants.add(cur);
+          Object.values(folderStore.folders).forEach((f) => {
+            if (f.parent_folder === cur) queue.push(f.id);
+          });
+        }
+        if (descendants.has(targetFolderId)) return; // circular — bail
+        try {
+          await folderStore.updateFolder(slug, draggedFolderId, { parent_folder: targetFolderId });
+        } catch (error) {
+          console.error("Failed to move folder:", error);
+        }
       }
     },
     [slug, folderStore]
   );
 
-  // Handle drop on root area (move page out of folder)
+  // Handle drop on root area (move page or folder out of any folder → root)
   const handleRootDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setDragOverFolderId("__root__");
@@ -185,12 +207,23 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
     async (e: React.DragEvent) => {
       e.preventDefault();
       setDragOverFolderId(null);
+      if (!slug) return;
+
       const pageId = e.dataTransfer.getData("application/x-wiki-page-id");
-      if (!pageId || !slug) return;
-      try {
-        await folderStore.movePageToFolder(slug, pageId, null);
-      } catch (error) {
-        console.error("Failed to move page to root:", error);
+      const draggedFolderId = e.dataTransfer.getData("application/x-wiki-folder-id");
+
+      if (pageId) {
+        try {
+          await folderStore.movePageToFolder(slug, pageId, null);
+        } catch (error) {
+          console.error("Failed to move page to root:", error);
+        }
+      } else if (draggedFolderId) {
+        try {
+          await folderStore.updateFolder(slug, draggedFolderId, { parent_folder: null });
+        } catch (error) {
+          console.error("Failed to move folder to root:", error);
+        }
       }
     },
     [slug, folderStore]

@@ -232,6 +232,7 @@ export const FolderNode = observer(function FolderNode(props: Props) {
         role="treeitem"
         aria-expanded={isExpanded}
         tabIndex={0}
+        draggable
         style={{ paddingLeft: `${indentPx}px` }}
         className={cn(
           "group flex w-full cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 hover:bg-layer-transparent-hover",
@@ -242,6 +243,11 @@ export const FolderNode = observer(function FolderNode(props: Props) {
           if (e.key === "Enter") handleToggle(e as unknown as React.MouseEvent);
         }}
         onContextMenu={handleContextMenu}
+        onDragStart={(e) => {
+          e.stopPropagation();
+          e.dataTransfer.setData("application/x-wiki-folder-id", folderId);
+          e.dataTransfer.effectAllowed = "move";
+        }}
         onDragOver={(e) => {
           e.preventDefault();
           e.stopPropagation();
