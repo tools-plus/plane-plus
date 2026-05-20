@@ -15,6 +15,7 @@ import { useParams, usePathname } from "next/navigation";
 import { Home, Loader2, FolderPlus } from "lucide-react";
 import { WikiIcon } from "@plane/propel/icons";
 import { ScrollArea } from "@plane/propel/scrollarea";
+import { AlertModalCore } from "@plane/ui";
 // components
 import { SidebarNavItem } from "@/components/sidebar/sidebar-navigation";
 import { AppSidebarToggleButton } from "@/components/sidebar/sidebar-toggle-button";
@@ -62,6 +63,8 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
   const [newFolderId, setNewFolderId] = useState<string | null>(null);
+  const [deletePageId, setDeletePageId] = useState<string | null>(null);
+  const [isDeletingPage, setIsDeletingPage] = useState(false);
 
   const slug = workspaceSlug?.toString() ?? "";
   const wikiBasePath = `/${slug}/wiki`;
@@ -127,27 +130,29 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
   }, [slug, isCreatingFolder, folderStore]);
 
   // Handle page deletion
-  const handleDeletePage = useCallback(
-    async (e: React.MouseEvent, pageId: string) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!slug) return;
-      const page = pagesList.find((p) => p.id === pageId);
-      if (!window.confirm(`Delete "${page?.name || "Untitled"}"? This cannot be undone.`)) return;
-      try {
-        await removePage({ pageId });
-      } catch {
-        // API returns 403 but actually deletes — force remove from store
-        runInAction(() => {
-          unset(wikiStore.data, [pageId]);
-        });
-      }
-      // Clean up folder map and navigate to home
-      folderStore.removePageFromMap(pageId);
-      router.push(wikiBasePath);
-    },
-    [slug, removePage, wikiStore, wikiBasePath, router, folderStore, pagesList]
-  );
+  // Opens the delete confirmation modal — actual deletion happens in handleConfirmDeletePage
+  const handleDeletePage = useCallback((e: React.MouseEvent, pageId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDeletePageId(pageId);
+  }, []);
+
+  const handleConfirmDeletePage = useCallback(async () => {
+    if (!deletePageId || !slug) return;
+    setIsDeletingPage(true);
+    try {
+      await removePage({ pageId: deletePageId });
+    } catch {
+      // API returns 403 but actually deletes — force remove from store
+      runInAction(() => {
+        unset(wikiStore.data, [deletePageId]);
+      });
+    }
+    folderStore.removePageFromMap(deletePageId);
+    router.push(wikiBasePath);
+    setDeletePageId(null);
+    setIsDeletingPage(false);
+  }, [deletePageId, slug, removePage, wikiStore, wikiBasePath, router, folderStore]);
 
   // Drag and drop handlers
   const handleDragOver = useCallback((_e: React.DragEvent, folderId: string) => {
@@ -192,110 +197,127 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
 
   const isInitLoading = loader === "init-loader";
 
+  const deletePageName = deletePageId ? pagesList.find((p) => p.id === deletePageId)?.name || "Untitled" : "";
+
   return (
-    <div className="flex h-full w-full animate-fade-in flex-col">
-      {/* Header */}
-      <div className="flex flex-col gap-2 px-3">
-        <div className="flex items-center justify-between gap-2 px-2">
-          <div className="flex items-center gap-1.5 pt-1">
-            <WikiIcon className="size-4 flex-shrink-0 text-primary" />
-            <span className="text-16 font-medium text-primary">Wiki</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              className="flex items-center rounded-md p-1 text-secondary hover:bg-layer-transparent-hover disabled:cursor-not-allowed disabled:opacity-50"
-              onClick={handleCreateFolder}
-              disabled={isCreatingFolder}
-              title="New folder"
-            >
-              {isCreatingFolder ? (
-                <Loader2 className="size-4 flex-shrink-0 animate-spin" />
-              ) : (
-                <FolderPlus className="size-4 flex-shrink-0" />
-              )}
-            </button>
-            <AppSidebarToggleButton />
+    <>
+      <AlertModalCore
+        handleClose={() => setDeletePageId(null)}
+        handleSubmit={handleConfirmDeletePage}
+        isSubmitting={isDeletingPage}
+        isOpen={!!deletePageId}
+        title="Delete page"
+        content={
+          <p className="text-sm text-secondary">
+            <span className="font-medium text-primary">&quot;{deletePageName}&quot;</span> will be permanently deleted.
+            This cannot be undone.
+          </p>
+        }
+      />
+      <div className="flex h-full w-full animate-fade-in flex-col">
+        {/* Header */}
+        <div className="flex flex-col gap-2 px-3">
+          <div className="flex items-center justify-between gap-2 px-2">
+            <div className="flex items-center gap-1.5 pt-1">
+              <WikiIcon className="size-4 flex-shrink-0 text-primary" />
+              <span className="text-16 font-medium text-primary">Wiki</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                className="flex items-center rounded-md p-1 text-secondary hover:bg-layer-transparent-hover disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={handleCreateFolder}
+                disabled={isCreatingFolder}
+                title="New folder"
+              >
+                {isCreatingFolder ? (
+                  <Loader2 className="size-4 flex-shrink-0 animate-spin" />
+                ) : (
+                  <FolderPlus className="size-4 flex-shrink-0" />
+                )}
+              </button>
+              <AppSidebarToggleButton />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Page/folder tree */}
-      <ScrollArea
-        orientation="vertical"
-        scrollType="hover"
-        size="sm"
-        rootClassName="size-full overflow-x-hidden overflow-y-auto"
-        viewportClassName="flex flex-col gap-0.5 overflow-x-hidden h-full w-full overflow-y-auto px-3 pt-3 pb-0.5"
-      >
-        {/* Home page link */}
-        <Link href={wikiBasePath}>
-          <SidebarNavItem isActive={isHomePath}>
-            <div className="flex items-center gap-1.5 py-[1px]">
-              <Home className="size-4 flex-shrink-0" />
-              <p className="text-13 leading-5 font-medium">Home</p>
+        {/* Page/folder tree */}
+        <ScrollArea
+          orientation="vertical"
+          scrollType="hover"
+          size="sm"
+          rootClassName="size-full overflow-x-hidden overflow-y-auto"
+          viewportClassName="flex flex-col gap-0.5 overflow-x-hidden h-full w-full overflow-y-auto px-3 pt-3 pb-0.5"
+        >
+          {/* Home page link */}
+          <Link href={wikiBasePath}>
+            <SidebarNavItem isActive={isHomePath}>
+              <div className="flex items-center gap-1.5 py-[1px]">
+                <Home className="size-4 flex-shrink-0" />
+                <p className="text-13 leading-5 font-medium">Home</p>
+              </div>
+            </SidebarNavItem>
+          </Link>
+
+          {/* Workspace section */}
+          <div className="mt-3">
+            <div className="px-2 py-1.5">
+              <span className="text-13 font-semibold text-placeholder">Workspace</span>
             </div>
-          </SidebarNavItem>
-        </Link>
 
-        {/* Workspace section */}
-        <div className="mt-3">
-          <div className="px-2 py-1.5">
-            <span className="text-13 font-semibold text-placeholder">Workspace</span>
-          </div>
-
-          {isInitLoading ? (
-            <div className="flex items-center justify-center py-4">
-              <Loader2 className="size-4 animate-spin text-placeholder" />
-            </div>
-          ) : (
-            <div className="flex flex-col gap-0.5" onDragOver={handleRootDragOver} onDrop={handleRootDrop}>
-              {/* Folders first (alphabetical) */}
-              {rootFolderIds.map((folderId) => (
-                <FolderNode
-                  key={folderId}
-                  folderId={folderId}
-                  workspaceSlug={slug}
-                  wikiBasePath={wikiBasePath}
-                  depth={0}
-                  onCreatePage={(fId) => handleCreatePage(fId)}
-                  onDeletePage={handleDeletePage}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                  dragOverFolderId={dragOverFolderId}
-                  currentPageId={currentPageId}
-                  allPagesList={pagesList}
-                  autoRename={folderId === newFolderId}
-                  onAutoRenameComplete={() => setNewFolderId(null)}
-                />
-              ))}
-
-              {/* Root pages (not in any folder, alphabetical) */}
-              {rootPages.map((page) => {
-                const pageId = page.id ?? "";
-                return (
-                  <WikiPageNode
-                    key={pageId}
-                    pageId={pageId}
-                    page={page}
+            {isInitLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="size-4 animate-spin text-placeholder" />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-0.5" onDragOver={handleRootDragOver} onDrop={handleRootDrop}>
+                {/* Folders first (alphabetical) */}
+                {rootFolderIds.map((folderId) => (
+                  <FolderNode
+                    key={folderId}
+                    folderId={folderId}
+                    workspaceSlug={slug}
                     wikiBasePath={wikiBasePath}
                     depth={0}
-                    isActive={currentPageId === pageId}
-                    onDelete={handleDeletePage}
+                    onCreatePage={(fId) => handleCreatePage(fId)}
+                    onDeletePage={handleDeletePage}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    dragOverFolderId={dragOverFolderId}
+                    currentPageId={currentPageId}
+                    allPagesList={pagesList}
+                    autoRename={folderId === newFolderId}
+                    onAutoRenameComplete={() => setNewFolderId(null)}
                   />
-                );
-              })}
+                ))}
 
-              {/* Empty state */}
-              {rootFolderIds.length === 0 && rootPages.length === 0 && (
-                <div className="px-2 py-4 text-center text-13 text-placeholder">
-                  No pages yet. Create your first wiki page.
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </ScrollArea>
-    </div>
+                {/* Root pages (not in any folder, alphabetical) */}
+                {rootPages.map((page) => {
+                  const pageId = page.id ?? "";
+                  return (
+                    <WikiPageNode
+                      key={pageId}
+                      pageId={pageId}
+                      page={page}
+                      wikiBasePath={wikiBasePath}
+                      depth={0}
+                      isActive={currentPageId === pageId}
+                      onDelete={handleDeletePage}
+                    />
+                  );
+                })}
+
+                {/* Empty state */}
+                {rootFolderIds.length === 0 && rootPages.length === 0 && (
+                  <div className="px-2 py-4 text-center text-13 text-placeholder">
+                    No pages yet. Create your first wiki page.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+    </>
   );
 });
