@@ -189,7 +189,7 @@ services:
       - ./data/minio:/export
 
   plane-litellm:
-    image: ghcr.io/berriai/litellm:main-latest
+    image: litellm/litellm:latest
     restart: unless-stopped
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://plane:plane@plane-db/plane}

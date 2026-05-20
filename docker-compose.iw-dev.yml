@@ -259,7 +259,7 @@ services:
 
   # ── AI Gateway ────────────────────────────────────────────
   iw-litellm:
-    image: ghcr.io/berriai/litellm:main-latest
+    image: litellm/litellm:latest
     container_name: iw-litellm
     restart: unless-stopped
     environment:
