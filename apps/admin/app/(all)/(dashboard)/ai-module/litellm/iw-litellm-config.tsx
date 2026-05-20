@@ -6,13 +6,12 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@plane/propel/button";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import { Input, ToggleSwitch } from "@plane/ui";
-import { CustomSelect } from "@plane/ui";
 import { cn } from "@plane/utils";
 import { ControllerInput } from "@/components/common/controller-input";
 
 // ---- Types ------------------------------------------------------------------
 
-export type TLiteLLMProvider = "anthropic" | "openai" | "azure" | "gemini";
+export type TLiteLLMProvider = string; // any LiteLLM-supported provider slug
 
 export type TLiteLLMConfig = {
   id?: string;
@@ -26,13 +25,6 @@ export type TLiteLLMConfig = {
   max_agent_budget: string;
   is_active: boolean;
 };
-
-const PROVIDER_OPTIONS: { value: TLiteLLMProvider; label: string }[] = [
-  { value: "anthropic", label: "Anthropic" },
-  { value: "openai", label: "OpenAI" },
-  { value: "azure", label: "Azure" },
-  { value: "gemini", label: "Gemini" },
-];
 
 const DEFAULT_VALUES: TLiteLLMConfig = {
   endpoint: "http://plane-litellm:4000",
@@ -87,11 +79,8 @@ export function IWLiteLLMConfig() {
     handleSubmit,
     control,
     reset,
-    watch,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<TLiteLLMConfig>({ defaultValues: DEFAULT_VALUES });
-
-  const selectedProvider = watch("provider");
 
   // Load config on mount
   useEffect(() => {
@@ -172,27 +161,14 @@ export function IWLiteLLMConfig() {
         />
       </div>
 
-      {/* Provider select */}
+      {/* Provider — free text, any LiteLLM-supported provider slug */}
       <div className="flex max-w-xs flex-col gap-1">
         <h4 className="text-13 text-tertiary">Provider</h4>
+        <p className="text-11 text-tertiary">Any LiteLLM provider slug (e.g. anthropic, openai, bedrock, ollama)</p>
         <Controller
           control={control}
           name="provider"
-          render={({ field }) => (
-            <CustomSelect
-              value={field.value}
-              label={PROVIDER_OPTIONS.find((p) => p.value === selectedProvider)?.label ?? "Select provider"}
-              onChange={(val: TLiteLLMProvider) => field.onChange(val)}
-              buttonClassName="rounded-md border-subtle"
-              input
-            >
-              {PROVIDER_OPTIONS.map((p) => (
-                <CustomSelect.Option key={p.value} value={p.value} className="w-full">
-                  {p.label}
-                </CustomSelect.Option>
-              ))}
-            </CustomSelect>
-          )}
+          render={({ field }) => <Input {...field} placeholder="anthropic" className="rounded-md border-subtle" />}
         />
       </div>
 
