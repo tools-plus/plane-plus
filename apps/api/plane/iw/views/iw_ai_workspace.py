@@ -13,6 +13,7 @@ from plane.app.permissions.iw_workspace_ai import (
     WorkspaceAISettingsPermission,
     WorkspaceAIPermission,
 )
+from plane.ai.litellm_client import get_litellm_client
 from plane.db.models import Workspace
 
 from plane.ai.models import (
@@ -217,6 +218,19 @@ class WorkspaceAgentDetailEndpoint(BaseAPIView):
         serializer = WorkspaceAgentSerializer(agent, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            # Sync budget change to LiteLLM if monthly_budget was updated
+            if "monthly_budget" in request.data and agent.litellm_virtual_key:
+                client = get_litellm_client()
+                if client:
+                    try:
+                        client.update_key(
+                            agent.litellm_virtual_key,
+                            budget_usd=float(agent.monthly_budget),
+                        )
+                    except Exception:
+                        # Non-fatal — the virtual key remains valid; budget will be
+                        # enforced correctly on the next provision cycle.
+                        pass
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
