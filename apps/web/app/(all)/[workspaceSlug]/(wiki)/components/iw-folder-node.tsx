@@ -5,6 +5,8 @@
 
 import { useCallback, useRef, useState } from "react";
 import { observer } from "mobx-react";
+import { runInAction } from "mobx";
+import { unset } from "lodash-es";
 import { ChevronRight, Folder, FolderOpen, MoreHorizontal } from "lucide-react";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import { AlertModalCore } from "@plane/ui";
@@ -133,12 +135,33 @@ export const FolderNode = observer(function FolderNode(props: Props) {
   const handleConfirmDelete = useCallback(async () => {
     setIsDeletingFolder(true);
     try {
-      // removeFolder returns page IDs that were in the deleted subtree
-      const deletedPageIds = await folderStore.removeFolder(workspaceSlug, folderId);
-      // Evict those pages from the wiki page store so they don't appear at root level
-      for (const pageId of deletedPageIds) {
-        wikiStore.removePage({ pageId, shouldSync: false });
+      // Collect entire subtree of folder IDs BEFORE deletion (BFS)
+      const toDelete = new Set<string>();
+      const queue = [folderId];
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        toDelete.add(current);
+        for (const f of Object.values(folderStore.folders)) {
+          if (f.parent_folder === current) queue.push(f.id);
+        }
       }
+
+      // Collect page IDs whose folder is in the subtree — read directly from wikiStore.data
+      // so we don't depend on pageFolderMap being in sync
+      const pageIdsToDelete = Object.values(wikiStore.data)
+        .filter((p) => p && toDelete.has((p as unknown as { folder?: string }).folder ?? ""))
+        .map((p) => (p as unknown as { id: string }).id)
+        .filter(Boolean);
+
+      await folderStore.removeFolder(workspaceSlug, folderId);
+
+      // Synchronously evict pages from wikiStore so sidebar updates immediately
+      runInAction(() => {
+        for (const pageId of pageIdsToDelete) {
+          unset(wikiStore.data, pageId);
+        }
+      });
+
       setIsDeleteModalOpen(false);
     } catch (error) {
       console.error("Failed to delete folder:", error);
