@@ -14,6 +14,7 @@ import { cn } from "@plane/utils";
 // hooks
 import { usePageFolders } from "@/hooks/store/use-page-folders";
 import { EPageStoreType, usePageStore } from "@/plane-web/hooks/store";
+import { useAppRouter } from "@/hooks/use-app-router";
 // local components
 import { FolderContextMenu } from "./iw-folder-context-menu";
 import { WikiPageNode } from "./iw-page-node";
@@ -51,6 +52,7 @@ export const FolderNode = observer(function FolderNode(props: Props) {
 
   const folderStore = usePageFolders();
   const wikiStore = usePageStore(EPageStoreType.WORKSPACE);
+  const router = useAppRouter();
   const folder = folderStore.folders[folderId];
   // observable.ref — reading the ref directly triggers MobX tracking
   const isExpanded = !!folderStore.expandedFolders[folderId];
@@ -162,6 +164,11 @@ export const FolderNode = observer(function FolderNode(props: Props) {
         }
       });
 
+      // If the currently viewed page was inside the deleted subtree, go to wiki home
+      if (currentPageId && pageIdsToDelete.includes(currentPageId)) {
+        router.push(wikiBasePath);
+      }
+
       setIsDeleteModalOpen(false);
     } catch (error) {
       console.error("Failed to delete folder:", error);
@@ -173,7 +180,7 @@ export const FolderNode = observer(function FolderNode(props: Props) {
     } finally {
       setIsDeletingFolder(false);
     }
-  }, [folderStore, wikiStore, workspaceSlug, folderId]);
+  }, [folderStore, wikiStore, router, workspaceSlug, folderId, currentPageId, wikiBasePath]);
 
   const handleNewSubFolder = useCallback(async () => {
     try {
