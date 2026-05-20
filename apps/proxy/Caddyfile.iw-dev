@@ -21,6 +21,8 @@
 	reverse_proxy /{$BUCKET_NAME}/* iw-minio:9000
 	reverse_proxy /{$BUCKET_NAME} iw-minio:9000
 
+	reverse_proxy /litellm/* iw-litellm:4000
+
 	reverse_proxy /* iw-web:3000
 }
 
