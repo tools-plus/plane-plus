@@ -64,7 +64,7 @@ export interface IPageFolderStore {
   syncPageFolderMap: (pages: Array<{ id?: string | null; folder?: string | null }>) => void;
   createFolder: (workspaceSlug: string, payload: TPageFolderCreatePayload) => Promise<TPageFolder>;
   updateFolder: (workspaceSlug: string, folderId: string, payload: TPageFolderUpdatePayload) => Promise<TPageFolder>;
-  removeFolder: (workspaceSlug: string, folderId: string) => Promise<void>;
+  removeFolder: (workspaceSlug: string, folderId: string) => Promise<string[]>;
   movePageToFolder: (workspaceSlug: string, pageId: string, folderId: string | null) => Promise<void>;
   removePageFromMap: (pageId: string) => void;
 }
@@ -291,11 +291,14 @@ export class PageFolderStore implements IPageFolderStore {
   /**
    * Delete a folder. Backend promotes children to parent and unsets pages.
    */
-  removeFolder = async (workspaceSlug: string, folderId: string): Promise<void> => {
+  removeFolder = async (workspaceSlug: string, folderId: string): Promise<string[]> => {
     const folder = this.folders[folderId];
-    if (!folder) return;
+    if (!folder) return [];
 
     await this.service.remove(workspaceSlug, folderId);
+
+    const deletedPageIds: string[] = [];
+
     runInAction(() => {
       // Collect the entire subtree of folder IDs to remove (BFS — mirrors backend)
       const toDelete = new Set<string>();
@@ -311,7 +314,10 @@ export class PageFolderStore implements IPageFolderStore {
       // Remove all pages that belonged to any folder in the subtree
       const nextMap = { ...this.pageFolderMap };
       for (const [pageId, mappedFolderId] of Object.entries(nextMap)) {
-        if (toDelete.has(mappedFolderId)) delete nextMap[pageId];
+        if (toDelete.has(mappedFolderId)) {
+          deletedPageIds.push(pageId);
+          delete nextMap[pageId];
+        }
       }
       this.pageFolderMap = nextMap;
 
@@ -324,6 +330,8 @@ export class PageFolderStore implements IPageFolderStore {
       this.expandedFolders = nextExpanded;
       saveExpandedState(nextExpanded);
     });
+
+    return deletedPageIds;
   };
 
   /**
