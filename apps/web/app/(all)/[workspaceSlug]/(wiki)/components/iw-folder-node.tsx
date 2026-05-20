@@ -36,7 +36,10 @@ type Props = {
   onAutoRenameComplete?: () => void;
 };
 
-const MAX_DEPTH = 4;
+// Store counts from 1 (root=1). MAX_NESTING_DEPTH in store = 4.
+// Component counts from 0 (root=0). Component depth 3 = store depth 4 = max allowed.
+// Hide "New Sub Folder" at component depth 3 so users can't attempt what the store blocks.
+const MAX_DEPTH = 3;
 
 export const FolderNode = observer(function FolderNode(props: Props) {
   const {

@@ -160,6 +160,19 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
     setDragOverFolderId(folderId);
   }, []);
 
+  // Max nesting levels (matches store's MAX_NESTING_DEPTH; store counts from 1)
+  const MAX_NESTING_DEPTH = 4;
+
+  // Returns the max depth of a folder's subtree (0 = leaf, 1 = has children, etc.)
+  const getSubtreeHeight = useCallback(
+    (folderId: string): number => {
+      const children = Object.values(folderStore.folders).filter((f) => f.parent_folder === folderId);
+      if (children.length === 0) return 0;
+      return 1 + Math.max(...children.map((c) => getSubtreeHeight(c.id)));
+    },
+    [folderStore.folders]
+  );
+
   const handleDrop = useCallback(
     async (e: React.DragEvent, targetFolderId: string) => {
       e.preventDefault();
@@ -176,7 +189,7 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
           console.error("Failed to move page to folder:", error);
         }
       } else if (draggedFolderId && draggedFolderId !== targetFolderId) {
-        // Guard: prevent dropping a folder into its own descendant
+        // Guard: prevent dropping a folder into its own descendant (circular)
         const descendants = new Set<string>();
         const queue = [draggedFolderId];
         while (queue.length > 0) {
@@ -186,7 +199,13 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
             if (f.parent_folder === cur) queue.push(f.id);
           });
         }
-        if (descendants.has(targetFolderId)) return; // circular — bail
+        if (descendants.has(targetFolderId)) return;
+
+        // Guard: subtree depth check — target depth + 1 (dragged) + subtree height must not exceed limit
+        const targetDepth = folderStore.getFolderDepth(targetFolderId); // store counts from 1
+        const subtreeHeight = getSubtreeHeight(draggedFolderId);
+        if (targetDepth + 1 + subtreeHeight > MAX_NESTING_DEPTH) return;
+
         try {
           await folderStore.updateFolder(slug, draggedFolderId, { parent_folder: targetFolderId });
         } catch (error) {
@@ -194,7 +213,7 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
         }
       }
     },
-    [slug, folderStore]
+    [slug, folderStore, getSubtreeHeight]
   );
 
   // Handle drop on root area (move page or folder out of any folder → root)
@@ -219,6 +238,9 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
           console.error("Failed to move page to root:", error);
         }
       } else if (draggedFolderId) {
+        // Depth check: at root (store depth 0), subtree height must not exceed limit
+        const subtreeHeight = getSubtreeHeight(draggedFolderId);
+        if (1 + subtreeHeight > MAX_NESTING_DEPTH) return;
         try {
           await folderStore.updateFolder(slug, draggedFolderId, { parent_folder: null });
         } catch (error) {
@@ -226,7 +248,7 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
         }
       }
     },
-    [slug, folderStore]
+    [slug, folderStore, getSubtreeHeight]
   );
 
   const isInitLoading = loader === "init-loader";
