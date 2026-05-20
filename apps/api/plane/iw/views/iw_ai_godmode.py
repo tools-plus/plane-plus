@@ -1,14 +1,13 @@
 # InfraWatch — God-mode REST API for AI module global entities
 # SPDX-License-Identifier: AGPL-3.0-only
 
-import requests as http_requests
-
 from rest_framework import status
 from rest_framework.response import Response
 
 from plane.app.views import BaseAPIView
 from plane.license.api.permissions import InstanceAdminPermission
 
+from plane.ai.litellm_client import LiteLLMClient
 from plane.ai.models import (
     LiteLLMConfig,
     GlobalAgent,
@@ -65,29 +64,19 @@ class LiteLLMConfigTestConnectionEndpoint(BaseAPIView):
     permission_classes = [InstanceAdminPermission]
 
     def post(self, request):
-        config = LiteLLMConfig.objects.first()
+        config = LiteLLMConfig.objects.filter(is_active=True).first()
         if config is None:
             return Response(
-                {"status": "error", "detail": "LiteLLM config not configured."},
-                status=status.HTTP_404_NOT_FOUND,
+                {"status": "error", "detail": "LiteLLM not configured."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-
-        health_url = config.endpoint.rstrip("/") + "/health/liveliness"
-        headers = {"Authorization": f"Bearer {config.master_key}"}
-
-        try:
-            resp = http_requests.get(health_url, headers=headers, timeout=10)
-            if resp.ok:
-                return Response({"status": "ok"}, status=status.HTTP_200_OK)
-            return Response(
-                {"status": "error", "detail": resp.text},
-                status=status.HTTP_200_OK,
-            )
-        except Exception as exc:
-            return Response(
-                {"status": "error", "detail": str(exc)},
-                status=status.HTTP_200_OK,
-            )
+        client = LiteLLMClient(config.endpoint, config.master_key)
+        if client.health_check():
+            return Response({"status": "ok"}, status=status.HTTP_200_OK)
+        return Response(
+            {"status": "error", "detail": "Cannot reach LiteLLM endpoint."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
 
 
 # ---------------------------------------------------------------------------

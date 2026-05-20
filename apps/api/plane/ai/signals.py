@@ -1,20 +1,32 @@
 """
-plane.ai signals — bot User + WorkspaceMember provisioning.
+plane.ai signals — bot User + WorkspaceMember provisioning,
+and LiteLLM virtual key lifecycle management.
 
 On WorkspaceAgent creation:
   - Creates a bot User (email=bot_<slug>@eyriehq.com, is_bot=True)
   - Creates a WorkspaceMember linking that user to the agent's workspace
     with role=15 (Member)
+  - Provisions a LiteLLM virtual key (if LiteLLM is configured)
 
 On WorkspaceAgent deletion:
   - Deactivates the bot User
   - Deletes the associated WorkspaceMember
+  - Revokes the LiteLLM virtual key (if one was provisioned)
+
+On WorkspaceAISettings enable:
+  - Provisions a workspace-level LiteLLM virtual key
+
+On WorkspaceAISettings disable:
+  - Revokes the workspace-level LiteLLM virtual key
 """
 
+import logging
 import uuid
 
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+
+logger = logging.getLogger("plane")
 
 
 @receiver(post_save, sender="db.WorkspaceAgent")
@@ -85,3 +97,106 @@ def deprovision_bot_user(sender, instance, **kwargs):
         workspace=instance.workspace,
         member_id=instance.bot_user_id,
     ).delete()
+
+
+# ---------------------------------------------------------------------------
+# LiteLLM virtual key lifecycle
+# ---------------------------------------------------------------------------
+
+
+@receiver(post_save, sender="db.WorkspaceAISettings")
+def provision_workspace_virtual_key(sender, instance, created, **kwargs):
+    """Provision or revoke a LiteLLM workspace-level virtual key on enable/disable."""
+    from plane.ai.litellm_client import get_litellm_client
+
+    client = get_litellm_client()
+    if not client:
+        return
+
+    if instance.is_enabled and not instance.litellm_virtual_key:
+        # Provision a new workspace-level key
+        try:
+            key = client.create_key(
+                key_alias=f"workspace-{instance.workspace.slug}",
+                budget_usd=float(instance.monthly_budget),
+                metadata={
+                    "workspace_slug": instance.workspace.slug,
+                    "type": "workspace",
+                },
+            )
+            # Use queryset update to avoid re-triggering this signal
+            sender.objects.filter(pk=instance.pk).update(litellm_virtual_key=key)
+        except Exception as exc:
+            logger.warning(
+                "Failed to provision workspace virtual key for %s: %s",
+                instance.workspace.slug,
+                exc,
+            )
+
+    elif not instance.is_enabled and instance.litellm_virtual_key:
+        # Revoke the key when AI is disabled
+        try:
+            client.delete_key(instance.litellm_virtual_key)
+            sender.objects.filter(pk=instance.pk).update(litellm_virtual_key="")
+        except Exception as exc:
+            logger.warning(
+                "Failed to revoke workspace virtual key for %s: %s",
+                instance.workspace.slug,
+                exc,
+            )
+
+
+@receiver(post_save, sender="db.WorkspaceAgent")
+def provision_agent_virtual_key(sender, instance, created, **kwargs):
+    """Provision a LiteLLM virtual key for a newly created workspace agent."""
+    if not created:
+        return  # Budget updates are handled at the view layer (PATCH endpoint)
+
+    from plane.ai.litellm_client import get_litellm_client
+
+    client = get_litellm_client()
+    if not client:
+        return
+
+    try:
+        key = client.create_key(
+            key_alias=f"agent-{instance.workspace.slug}-{instance.slug}",
+            budget_usd=float(instance.monthly_budget),
+            metadata={
+                "workspace_slug": instance.workspace.slug,
+                "agent_slug": instance.slug,
+                "type": "agent",
+            },
+        )
+        # Use queryset update to avoid re-triggering this signal
+        sender.objects.filter(pk=instance.pk).update(litellm_virtual_key=key)
+    except Exception as exc:
+        logger.warning(
+            "Failed to provision agent virtual key for %s/%s: %s",
+            instance.workspace.slug,
+            instance.slug,
+            exc,
+        )
+
+
+@receiver(post_delete, sender="db.WorkspaceAgent")
+def revoke_agent_virtual_key(sender, instance, **kwargs):
+    """Revoke the LiteLLM virtual key when an agent is deleted."""
+    if not instance.litellm_virtual_key:
+        return
+
+    from plane.ai.litellm_client import get_litellm_client
+
+    client = get_litellm_client()
+    if not client:
+        return
+
+    try:
+        client.delete_key(instance.litellm_virtual_key)
+    except Exception as exc:
+        logger.warning(
+            "Failed to revoke agent virtual key for %s/%s: %s",
+            instance.workspace.slug,
+            instance.slug,
+            exc,
+        )
