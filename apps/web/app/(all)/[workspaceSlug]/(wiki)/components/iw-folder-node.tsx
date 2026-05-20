@@ -3,7 +3,7 @@
  * Supports expand/collapse, drag-and-drop (as drop target), context menu, and inline rename.
  */
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { runInAction } from "mobx";
 import { unset } from "lodash-es";
@@ -32,6 +32,8 @@ type Props = {
   dragOverFolderId: string | null;
   currentPageId?: string;
   allPagesList: Array<{ id?: string | null; name?: string; logo_props?: Record<string, unknown> }>;
+  autoRename?: boolean;
+  onAutoRenameComplete?: () => void;
 };
 
 const MAX_DEPTH = 4;
@@ -49,6 +51,8 @@ export const FolderNode = observer(function FolderNode(props: Props) {
     dragOverFolderId,
     currentPageId,
     allPagesList,
+    autoRename = false,
+    onAutoRenameComplete,
   } = props;
 
   const folderStore = usePageFolders();
@@ -73,7 +77,22 @@ export const FolderNode = observer(function FolderNode(props: Props) {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeletingFolder, setIsDeletingFolder] = useState(false);
+  const [newSubFolderId, setNewSubFolderId] = useState<string | null>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-enter rename mode when folder is first created
+  useEffect(() => {
+    if (!autoRename) return;
+    setRenameValue(folder.name);
+    setIsRenaming(true);
+    // Wait for input to render, then focus and select all
+    setTimeout(() => {
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+      onAutoRenameComplete?.();
+    }, 50);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentionally empty — only fires once on mount
 
   // Pages in this folder, sorted alphabetically
   const pagesInFolder = allPagesList
@@ -187,11 +206,12 @@ export const FolderNode = observer(function FolderNode(props: Props) {
 
   const handleNewSubFolder = useCallback(async () => {
     try {
-      await folderStore.createFolder(workspaceSlug, {
+      const newFolder = await folderStore.createFolder(workspaceSlug, {
         name: "New Folder",
         parent_folder: folderId,
       });
       folderStore.setFolderExpanded(folderId, true);
+      setNewSubFolderId(newFolder.id);
     } catch (error) {
       console.error("Failed to create sub-folder:", error);
     }
@@ -335,6 +355,8 @@ export const FolderNode = observer(function FolderNode(props: Props) {
               dragOverFolderId={dragOverFolderId}
               currentPageId={currentPageId}
               allPagesList={allPagesList}
+              autoRename={childId === newSubFolderId}
+              onAutoRenameComplete={() => setNewSubFolderId(null)}
             />
           ))}
 

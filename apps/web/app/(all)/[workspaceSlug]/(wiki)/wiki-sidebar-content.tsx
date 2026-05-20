@@ -61,6 +61,7 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
   const [isCreating, setIsCreating] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
+  const [newFolderId, setNewFolderId] = useState<string | null>(null);
 
   const slug = workspaceSlug?.toString() ?? "";
   const wikiBasePath = `/${slug}/wiki`;
@@ -113,10 +114,11 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
     if (!slug || isCreatingFolder) return;
     setIsCreatingFolder(true);
     try {
-      await folderStore.createFolder(slug, {
+      const newFolder = await folderStore.createFolder(slug, {
         name: "New Folder",
         parent_folder: null,
       });
+      setNewFolderId(newFolder.id);
     } catch (error) {
       console.error("Failed to create folder:", error);
     } finally {
@@ -263,6 +265,8 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
                   dragOverFolderId={dragOverFolderId}
                   currentPageId={currentPageId}
                   allPagesList={pagesList}
+                  autoRename={folderId === newFolderId}
+                  onAutoRenameComplete={() => setNewFolderId(null)}
                 />
               ))}
 
