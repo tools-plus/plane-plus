@@ -257,6 +257,23 @@ services:
     networks:
       - iw-dev
 
+  # ── AI Gateway ────────────────────────────────────────────
+  iw-litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: iw-litellm
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://plane:plane@iw-db:5432/plane
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-litellm-local-dev}
+      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY:-litellm-salt-local}
+      DATABASE_SCHEMA: litellm
+      PORT: "4000"
+      STORE_MODEL_IN_DB: "True"
+    depends_on:
+      - iw-api
+    networks:
+      - iw-dev
+
   # ── Proxy (Caddy — unified access point) ──────────────────
   iw-proxy:
     build:
@@ -276,6 +293,7 @@ services:
       - iw-api
       - iw-space
       - iw-admin
+      - iw-litellm
     networks:
       - iw-dev
 
