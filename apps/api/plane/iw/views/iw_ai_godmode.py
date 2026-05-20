@@ -124,6 +124,69 @@ class LiteLLMConfigTestConnectionEndpoint(BaseAPIView):
         )
 
 
+class LiteLLMConfigTestModelEndpoint(BaseAPIView):
+    """Send a minimal chat completion through LiteLLM to verify end-to-end routing.
+
+    Accepts an optional ``model`` body parameter (e.g. "anthropic/claude-3-haiku-20240307").
+    Falls back to the provider stored in LiteLLMConfig when omitted.
+    """
+
+    permission_classes = [InstanceAdminPermission]
+
+    def post(self, request):
+        import requests as req_lib
+
+        config = LiteLLMConfig.objects.first()
+        if config is None:
+            return Response(
+                {"detail": "LiteLLM not configured yet. Save the configuration first."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        model = request.data.get("model") or config.provider
+        url = f"{config.endpoint.rstrip('/')}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {config.master_key}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "model": model,
+            "messages": [{"role": "user", "content": "Say hello in one word."}],
+            "max_tokens": 10,
+        }
+
+        try:
+            resp = req_lib.post(url, json=payload, headers=headers, timeout=30)
+            if resp.status_code == 200:
+                data = resp.json()
+                reply = (
+                    data.get("choices", [{}])[0]
+                    .get("message", {})
+                    .get("content", "")
+                    .strip()
+                )
+                return Response(
+                    {"status": "ok", "model": model, "reply": reply},
+                    status=status.HTTP_200_OK,
+                )
+            # Pass through LiteLLM's error body for easier debugging
+            try:
+                err = resp.json()
+            except Exception:
+                err = {"detail": resp.text}
+            return Response(err, status=resp.status_code)
+        except req_lib.exceptions.Timeout:
+            return Response(
+                {"detail": f"Request to LiteLLM timed out after 30 s. Model: {model}"},
+                status=status.HTTP_504_GATEWAY_TIMEOUT,
+            )
+        except Exception as exc:
+            return Response(
+                {"detail": f"Unexpected error: {exc}"},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+
+
 # ---------------------------------------------------------------------------
 # Global Agents
 # ---------------------------------------------------------------------------

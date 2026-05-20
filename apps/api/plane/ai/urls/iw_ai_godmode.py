@@ -7,6 +7,7 @@ from django.urls import path
 from plane.iw.views.iw_ai_godmode import (
     LiteLLMConfigEndpoint,
     LiteLLMConfigTestConnectionEndpoint,
+    LiteLLMConfigTestModelEndpoint,
     GlobalAgentEndpoint,
     GlobalAgentDetailEndpoint,
     GlobalSkillEndpoint,
@@ -28,6 +29,11 @@ urlpatterns = [
         "litellm-config/test-connection/",
         LiteLLMConfigTestConnectionEndpoint.as_view(),
         name="god-mode-ai-litellm-test",
+    ),
+    path(
+        "litellm-config/test-model/",
+        LiteLLMConfigTestModelEndpoint.as_view(),
+        name="god-mode-ai-litellm-test-model",
     ),
     # Global Agents
     path(

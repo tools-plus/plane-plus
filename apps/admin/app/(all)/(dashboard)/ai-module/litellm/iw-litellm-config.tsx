@@ -66,6 +66,22 @@ async function testLiteLLMConnection(): Promise<{ success: boolean; message: str
   return { success: true, message: "Connection successful" };
 }
 
+async function testLiteLLMModel(model?: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetch("/api/god-mode/ai/litellm-config/test-model/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(model ? { model } : {}),
+  });
+  const body = (await res.json().catch(() => ({}))) as { detail?: string; reply?: string; model?: string };
+  if (!res.ok) {
+    return { success: false, message: body?.detail ?? "Model call failed" };
+  }
+  return {
+    success: true,
+    message: `Model replied (${body.model ?? "unknown"}): "${body.reply}"`,
+  };
+}
+
 // ---- Component --------------------------------------------------------------
 
 export function IWLiteLLMConfig() {
@@ -73,6 +89,8 @@ export function IWLiteLLMConfig() {
   const [modelRoutingExpanded, setModelRoutingExpanded] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [isTesting, setIsTesting] = useState(false);
+  const [modelTestResult, setModelTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [isTestingModel, setIsTestingModel] = useState(false);
 
   const {
     handleSubmit,
@@ -118,6 +136,21 @@ export function IWLiteLLMConfig() {
       setTestResult({ success: false, message: "An unexpected error occurred." });
     } finally {
       setIsTesting(false);
+    }
+  };
+
+  const handleTestModel = async () => {
+    setIsTestingModel(true);
+    setModelTestResult(null);
+    try {
+      // Pass the current provider value from the form as the model hint
+      const provider = watch("provider");
+      const result = await testLiteLLMModel(provider || undefined);
+      setModelTestResult(result);
+    } catch {
+      setModelTestResult({ success: false, message: "An unexpected error occurred." });
+    } finally {
+      setIsTestingModel(false);
     }
   };
 
@@ -251,17 +284,35 @@ export function IWLiteLLMConfig() {
             )}
           </div>
 
-          {/* Test connection result */}
-          {testResult && (
-            <div
-              className={cn(
-                "rounded-md border px-4 py-2 text-body-sm-regular",
-                testResult.success
-                  ? "border-green-500/30 bg-green-500/10 text-green-600"
-                  : "border-red-500/30 bg-red-500/10 text-red-600"
+          {/* Test results */}
+          {(testResult || modelTestResult) && (
+            <div className="space-y-2">
+              {testResult && (
+                <div
+                  className={cn(
+                    "rounded-md border px-4 py-2 text-body-sm-regular",
+                    testResult.success
+                      ? "border-green-500/30 bg-green-500/10 text-green-600"
+                      : "border-red-500/30 bg-red-500/10 text-red-600"
+                  )}
+                >
+                  <span className="font-medium">Connection: </span>
+                  {testResult.message}
+                </div>
               )}
-            >
-              {testResult.message}
+              {modelTestResult && (
+                <div
+                  className={cn(
+                    "rounded-md border px-4 py-2 text-body-sm-regular",
+                    modelTestResult.success
+                      ? "border-green-500/30 bg-green-500/10 text-green-600"
+                      : "border-red-500/30 bg-red-500/10 text-red-600"
+                  )}
+                >
+                  <span className="font-medium">Model call: </span>
+                  {modelTestResult.message}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -273,9 +324,14 @@ export function IWLiteLLMConfig() {
           {isSubmitting ? "Saving…" : "Save changes"}
         </Button>
         {isActive && (
-          <Button type="button" variant="secondary" size="lg" loading={isTesting} onClick={handleTestConnection}>
-            {isTesting ? "Testing…" : "Test connection"}
-          </Button>
+          <>
+            <Button type="button" variant="secondary" size="lg" loading={isTesting} onClick={handleTestConnection}>
+              {isTesting ? "Testing…" : "Test connection"}
+            </Button>
+            <Button type="button" variant="secondary" size="lg" loading={isTestingModel} onClick={handleTestModel}>
+              {isTestingModel ? "Calling model…" : "Test model call"}
+            </Button>
+          </>
         )}
       </div>
     </form>

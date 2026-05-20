@@ -37,14 +37,16 @@ class LiteLLMConfigSerializer(serializers.ModelSerializer):
 
 
 class GlobalAgentSerializer(serializers.ModelSerializer):
-    skills = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=GlobalSkill.objects.all(), required=False
+    # Use slug (== builtin_ref for built-ins) so the frontend sends human-readable
+    # identifiers instead of opaque UUIDs.
+    skills = serializers.SlugRelatedField(
+        many=True, queryset=GlobalSkill.objects.all(), slug_field="slug", required=False
     )
-    tools = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=GlobalTool.objects.all(), required=False
+    tools = serializers.SlugRelatedField(
+        many=True, queryset=GlobalTool.objects.all(), slug_field="slug", required=False
     )
-    mcp_connections = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=GlobalMCPConnection.objects.all(), required=False
+    mcp_connections = serializers.SlugRelatedField(
+        many=True, queryset=GlobalMCPConnection.objects.all(), slug_field="slug", required=False
     )
 
     class Meta:
