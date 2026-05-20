@@ -12,7 +12,8 @@ import { runInAction } from "mobx";
 import { unset } from "lodash-es";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { Home, Loader2, FolderPlus } from "lucide-react";
+import { Home, Loader2, Plus, FolderPlus, FileText } from "lucide-react";
+import { CustomMenu } from "@plane/ui";
 import { WikiIcon } from "@plane/propel/icons";
 import { ScrollArea } from "@plane/propel/scrollarea";
 import { AlertModalCore } from "@plane/ui";
@@ -223,19 +224,37 @@ export const WikiSidebarContent = observer(function WikiSidebarContent() {
               <span className="text-16 font-medium text-primary">Wiki</span>
             </div>
             <div className="flex items-center gap-1">
-              <button
-                type="button"
-                className="flex items-center rounded-md p-1 text-secondary hover:bg-layer-transparent-hover disabled:cursor-not-allowed disabled:opacity-50"
-                onClick={handleCreateFolder}
-                disabled={isCreatingFolder}
-                title="New folder"
+              <CustomMenu
+                customButton={
+                  <button
+                    type="button"
+                    className="flex items-center rounded-md p-1 text-secondary hover:bg-layer-transparent-hover disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={isCreatingFolder || isCreating}
+                    title="New"
+                  >
+                    {isCreatingFolder || isCreating ? (
+                      <Loader2 className="size-4 flex-shrink-0 animate-spin" />
+                    ) : (
+                      <Plus className="size-4 flex-shrink-0" />
+                    )}
+                  </button>
+                }
+                placement="bottom-start"
+                closeOnSelect
               >
-                {isCreatingFolder ? (
-                  <Loader2 className="size-4 flex-shrink-0 animate-spin" />
-                ) : (
-                  <FolderPlus className="size-4 flex-shrink-0" />
-                )}
-              </button>
+                <CustomMenu.MenuItem onClick={handleCreateFolder}>
+                  <span className="flex items-center gap-2">
+                    <FolderPlus className="size-3.5 text-secondary" />
+                    <span>New folder</span>
+                  </span>
+                </CustomMenu.MenuItem>
+                <CustomMenu.MenuItem onClick={() => handleCreatePage(undefined)}>
+                  <span className="flex items-center gap-2">
+                    <FileText className="size-3.5 text-secondary" />
+                    <span>New page</span>
+                  </span>
+                </CustomMenu.MenuItem>
+              </CustomMenu>
               <AppSidebarToggleButton />
             </div>
           </div>
