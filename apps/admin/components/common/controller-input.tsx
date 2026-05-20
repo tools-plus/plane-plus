@@ -21,6 +21,7 @@ type Props = {
   description?: string | React.ReactNode;
   placeholder: string;
   error: boolean;
+  errorMessage?: string;
   required: boolean;
 };
 
@@ -35,13 +36,16 @@ export type TControllerInputFormField = {
 };
 
 export function ControllerInput(props: Props) {
-  const { name, control, type, label, description, placeholder, error, required } = props;
+  const { name, control, type, label, description, placeholder, error, errorMessage, required } = props;
   // states
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="flex flex-col gap-1">
-      <h4 className="text-13 text-tertiary">{label}</h4>
+      <h4 className="text-13 text-tertiary">
+        {label}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
+      </h4>
       <div className="relative">
         <Controller
           control={control}
@@ -82,6 +86,7 @@ export function ControllerInput(props: Props) {
             </button>
           ))}
       </div>
+      {errorMessage && <p className="text-red-500 text-11">{errorMessage}</p>}
       {description && <p className="pt-0.5 text-11 text-tertiary">{description}</p>}
     </div>
   );

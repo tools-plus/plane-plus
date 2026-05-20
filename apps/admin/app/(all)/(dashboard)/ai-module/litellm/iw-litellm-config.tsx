@@ -80,7 +80,10 @@ export function IWLiteLLMConfig() {
     reset,
     watch,
     formState: { errors, isSubmitting, isDirty },
-  } = useForm<TLiteLLMConfig>({ defaultValues: DEFAULT_VALUES });
+  } = useForm<TLiteLLMConfig>({
+    defaultValues: DEFAULT_VALUES,
+    mode: "onTouched", // show errors after field is touched, not just on submit
+  });
 
   const isActive = watch("is_active");
 
@@ -163,7 +166,8 @@ export function IWLiteLLMConfig() {
               label="Endpoint"
               placeholder="http://plane-litellm:4000"
               error={Boolean(errors.endpoint)}
-              required={false}
+              errorMessage={errors.endpoint?.message}
+              required
             />
             <ControllerInput
               control={control}
@@ -171,20 +175,32 @@ export function IWLiteLLMConfig() {
               name="master_key"
               label="Master Key"
               placeholder="sk-••••••••"
+              description="Leave blank to keep the existing key."
               error={Boolean(errors.master_key)}
+              errorMessage={errors.master_key?.message}
               required={false}
             />
           </div>
 
           {/* Provider — free text, any LiteLLM-supported provider slug */}
           <div className="flex max-w-xs flex-col gap-1">
-            <h4 className="text-13 text-tertiary">Provider</h4>
+            <h4 className="text-13 text-tertiary">
+              Provider <span className="text-red-500">*</span>
+            </h4>
             <p className="text-11 text-tertiary">Any LiteLLM provider slug (e.g. anthropic, openai, bedrock, ollama)</p>
             <Controller
               control={control}
               name="provider"
-              render={({ field }) => <Input {...field} placeholder="anthropic" className="rounded-md border-subtle" />}
+              rules={{ required: "Provider is required." }}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder="anthropic"
+                  className={`rounded-md ${errors.provider ? "border-red-500" : "border-subtle"}`}
+                />
+              )}
             />
+            {errors.provider && <p className="text-red-500 text-11">{errors.provider.message}</p>}
           </div>
 
           {/* Budget fields */}
