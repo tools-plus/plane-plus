@@ -80,19 +80,19 @@ export const FolderNode = observer(function FolderNode(props: Props) {
   const [newSubFolderId, setNewSubFolderId] = useState<string | null>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-enter rename mode when folder is first created
+  // Auto-enter rename mode when autoRename flips to true (fires after store update + state update)
   useEffect(() => {
     if (!autoRename) return;
     setRenameValue(folder.name);
     setIsRenaming(true);
-    // Wait for input to render, then focus and select all
     setTimeout(() => {
       renameInputRef.current?.focus();
       renameInputRef.current?.select();
       onAutoRenameComplete?.();
     }, 50);
+    // folder.name and onAutoRenameComplete intentionally excluded — one-shot on autoRename flip
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // intentionally empty — only fires once on mount
+  }, [autoRename]);
 
   // Pages in this folder, sorted alphabetically
   const pagesInFolder = allPagesList
@@ -129,7 +129,10 @@ export const FolderNode = observer(function FolderNode(props: Props) {
   const handleStartRename = () => {
     setRenameValue(folder.name);
     setIsRenaming(true);
-    setTimeout(() => renameInputRef.current?.focus(), 50);
+    setTimeout(() => {
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+    }, 50);
   };
 
   const handleFinishRename = useCallback(async () => {
