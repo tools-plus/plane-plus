@@ -159,10 +159,9 @@ class LiteLLMConfigTestModelEndpoint(BaseAPIView):
             resp = req_lib.post(url, json=payload, headers=headers, timeout=30)
             if resp.status_code == 200:
                 data = resp.json()
+                # content can be None explicitly (not just missing), so use `or ""`
                 reply = (
-                    data.get("choices", [{}])[0]
-                    .get("message", {})
-                    .get("content", "")
+                    (data.get("choices", [{}])[0].get("message", {}).get("content") or "")
                     .strip()
                 )
                 return Response(

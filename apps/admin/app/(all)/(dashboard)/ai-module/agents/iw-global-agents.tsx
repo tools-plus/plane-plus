@@ -222,10 +222,16 @@ function AgentDrawerForm({
 
       {/* Model preference */}
       <div className="flex flex-col gap-1">
-        <span className="text-13 text-tertiary">Model preference</span>
+        <span className="text-13 text-tertiary">
+          Model preference <span className="text-red-500">*</span>
+        </span>
         <p className="text-11 text-tertiary">LiteLLM model string, e.g. anthropic/claude-sonnet-4-5, openrouter/…</p>
         <div className="flex gap-2">
-          <Input {...register("model_pref")} placeholder="anthropic/claude-sonnet-4-5" className="w-full rounded-md" />
+          <Input
+            {...register("model_pref", { required: "Model preference is required." })}
+            placeholder="anthropic/claude-sonnet-4-5"
+            className={`w-full rounded-md ${errors.model_pref ? "border-red-500" : ""}`}
+          />
           <Button
             type="button"
             variant="secondary"
@@ -260,6 +266,7 @@ function AgentDrawerForm({
             {isTestingModel ? "Testing…" : "Test"}
           </Button>
         </div>
+        {errors.model_pref && <p className="text-red-500 text-11">{errors.model_pref.message}</p>}
       </div>
 
       {/* Budget */}
