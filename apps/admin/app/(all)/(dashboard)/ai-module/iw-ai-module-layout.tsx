@@ -7,8 +7,8 @@ const AI_MODULE_TABS = [
   { label: "LiteLLM", href: "/ai-module/litellm" },
   { label: "Agents", href: "/ai-module/agents" },
   { label: "Skills", href: "/ai-module/skills" },
-  { label: "Tools", href: "/ai-module/tools" },
   { label: "MCP Connections", href: "/ai-module/mcp-connections" },
+  { label: "Tools", href: "/ai-module/tools" },
 ] as const;
 
 export default function IWAiModuleLayout() {

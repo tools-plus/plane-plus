@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@plane/propel/button";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import { Input, Loader, ToggleSwitch } from "@plane/ui";
@@ -214,17 +214,7 @@ export function IWGlobalTools() {
           <p className="text-body-sm-regular text-secondary">
             {tools.length} tool{tools.length !== 1 ? "s" : ""}
           </p>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => {
-              setEditingTool(null);
-              setDrawerOpen(true);
-            }}
-          >
-            <Plus className="mr-1 h-4 w-4" />
-            New Tool
-          </Button>
+          <p className="text-11 text-tertiary">Tools are registered in code and deployed via migrations.</p>
         </div>
 
         {tools.length === 0 ? (
