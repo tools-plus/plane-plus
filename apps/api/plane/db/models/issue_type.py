@@ -27,6 +27,13 @@ class IssueType(BaseModel):
         verbose_name = "Issue Type"
         verbose_name_plural = "Issue Types"
         db_table = "issue_types"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["workspace"],
+                condition=Q(is_epic=True, deleted_at__isnull=True),
+                name="issue_type_unique_epic_per_workspace",
+            )
+        ]
 
     def __str__(self):
         return self.name

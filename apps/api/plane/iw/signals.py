@@ -1,14 +1,18 @@
 """
-InfraWatch signals — auto-derive epic state from child work items.
+InfraWatch signals.
 
-When a child issue's state changes, recompute the parent epic's state
-based on the aggregate of all children's state groups.
+- Auto-derive epic state from child work items: when a child issue's state
+  changes, recompute the parent epic's state based on the aggregate of all
+  children's state groups.
+- Provision the workspace Epic IssueType whenever a project's "Epics"
+  setting is saved on.
 """
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from plane.db.models import Issue, State
+from plane.db.models import Issue, Project, State
+from plane.iw.provisioning import ensure_workspace_epic_type
 
 
 def _compute_epic_state(epic):
@@ -91,3 +95,27 @@ def update_parent_epic_state(sender, instance, **kwargs):
     if new_state and new_state.id != parent.state_id:
         # Direct update to avoid recursive signal loops
         Issue.objects.filter(id=parent.id).update(state_id=new_state.id)
+
+
+@receiver(post_save, sender=Project)
+def provision_epic_type_on_enable(sender, instance, **kwargs):
+    """
+    PP-85 — single source of truth for Epic IssueType provisioning.
+
+    The "Epics" project setting reuses Project.is_issue_type_enabled (there
+    is no separate is_epic_enabled field). Whenever a project is saved with
+    that flag on, make sure the workspace has an Epic IssueType linked to
+    it — regardless of which path saved the project (app create/patch,
+    API-v1 create/patch, bulk/shell saves, ...).
+
+    ensure_workspace_epic_type is fully idempotent, so this is a cheap
+    no-op on every subsequent save where the flag is already True.
+    """
+    # Skip fixture loads (e.g. `loaddata`) — raw saves bypass the ORM's
+    # normal ForeignKey resolution, and provisioning here would just be
+    # redundant work against data that hasn't finished loading yet.
+    if kwargs.get("raw"):
+        return
+    if not instance.is_issue_type_enabled:
+        return
+    ensure_workspace_epic_type(instance.workspace, project=instance)

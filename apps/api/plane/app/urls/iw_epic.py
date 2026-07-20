@@ -9,15 +9,14 @@ from django.urls import path
 from plane.app.views import (
     IwEpicViewSet,
     IwEpicListEndpoint,
-    IssueActivityEndpoint,
-    IssueAttachmentEndpoint,
-    IssueAttachmentV2Endpoint,
-    IssueCommentViewSet,
-    CommentReactionViewSet,
-    IssueLinkViewSet,
-    IssueReactionViewSet,
-    SubIssuesEndpoint,
-    ProjectUserDisplayPropertyEndpoint,
+    IwEpicSubIssuesEndpoint,
+    IwEpicActivityEndpoint,
+    IwEpicAttachmentEndpoint,
+    IwEpicAttachmentV2Endpoint,
+    IwEpicCommentViewSet,
+    IwEpicLinkViewSet,
+    IwEpicReactionViewSet,
+    IwEpicUserDisplayPropertyEndpoint,
 )
 
 urlpatterns = [
@@ -50,30 +49,30 @@ urlpatterns = [
     # Epic sub-issues (child work items)
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/sub-issues/",
-        SubIssuesEndpoint.as_view(),
+        IwEpicSubIssuesEndpoint.as_view(),
         name="project-epics-sub-issues",
     ),
     # Epic activity/history
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/history/",
-        IssueActivityEndpoint.as_view(),
+        IwEpicActivityEndpoint.as_view(),
         name="project-epic-history",
     ),
     # Epic child work items (issues parented to this epic)
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/issues/",
-        SubIssuesEndpoint.as_view(),
+        IwEpicSubIssuesEndpoint.as_view(),
         name="project-epic-issues",
     ),
     # Epic comments
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/comments/",
-        IssueCommentViewSet.as_view({"get": "list", "post": "create"}),
+        IwEpicCommentViewSet.as_view({"get": "list", "post": "create"}),
         name="project-epic-comments",
     ),
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/comments/<uuid:pk>/",
-        IssueCommentViewSet.as_view(
+        IwEpicCommentViewSet.as_view(
             {
                 "get": "retrieve",
                 "put": "update",
@@ -86,12 +85,12 @@ urlpatterns = [
     # Epic reactions
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/reactions/",
-        IssueReactionViewSet.as_view({"get": "list", "post": "create"}),
+        IwEpicReactionViewSet.as_view({"get": "list", "post": "create"}),
         name="project-epic-reactions",
     ),
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/reactions/<str:reaction_code>/",
-        IssueReactionViewSet.as_view({"delete": "destroy"}),
+        IwEpicReactionViewSet.as_view({"delete": "destroy"}),
         name="project-epic-reaction-delete",
     ),
     # Comment reactions (shared — comments have their own IDs, not scoped to epics)
@@ -99,12 +98,12 @@ urlpatterns = [
     # Epic links
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/issue-links/",
-        IssueLinkViewSet.as_view({"get": "list", "post": "create"}),
+        IwEpicLinkViewSet.as_view({"get": "list", "post": "create"}),
         name="project-epic-links",
     ),
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/issue-links/<uuid:pk>/",
-        IssueLinkViewSet.as_view(
+        IwEpicLinkViewSet.as_view(
             {
                 "get": "retrieve",
                 "put": "update",
@@ -117,29 +116,29 @@ urlpatterns = [
     # Epic attachments
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/issue-attachments/",
-        IssueAttachmentEndpoint.as_view(),
+        IwEpicAttachmentEndpoint.as_view(),
         name="project-epic-attachments",
     ),
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/issue-attachments/<uuid:pk>/",
-        IssueAttachmentEndpoint.as_view(),
+        IwEpicAttachmentEndpoint.as_view(),
         name="project-epic-attachment-detail",
     ),
     # Epic attachments v2
     path(
         "assets/v2/workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/attachments/",
-        IssueAttachmentV2Endpoint.as_view(),
+        IwEpicAttachmentV2Endpoint.as_view(),
         name="project-epic-attachments-v2",
     ),
     path(
         "assets/v2/workspaces/<str:slug>/projects/<uuid:project_id>/epics/<uuid:issue_id>/attachments/<uuid:pk>/",
-        IssueAttachmentV2Endpoint.as_view(),
+        IwEpicAttachmentV2Endpoint.as_view(),
         name="project-epic-attachment-v2-detail",
     ),
     # Epic user display properties
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/epics-user-properties/",
-        ProjectUserDisplayPropertyEndpoint.as_view(),
+        IwEpicUserDisplayPropertyEndpoint.as_view(),
         name="project-epics-user-properties",
     ),
     # v2 epic list (cursor-based pagination)
