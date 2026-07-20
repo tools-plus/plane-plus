@@ -15,6 +15,10 @@ from plane.db.models import Project
 
 
 def user_timezone_converter(queryset, datetime_fields, user_timezone):
+    # Nothing to convert (e.g. a create/lookup that found no matching row)
+    if queryset is None:
+        return None
+
     # Create a timezone object for the user's timezone
     user_tz = pytz.timezone(user_timezone)
 

@@ -482,6 +482,15 @@ class IssueViewSet(BaseViewSet):
                 )
                 .first()
             )
+            if issue is None:
+                # The created row didn't match this viewset's queryset (e.g. an
+                # epic-scoped subclass whose type filter the saved issue no
+                # longer satisfies). Fail clearly instead of returning a
+                # broken/empty payload.
+                return Response(
+                    {"error": "Issue was created but could not be re-fetched."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
             datetime_fields = ["created_at", "updated_at"]
             issue = user_timezone_converter(issue, datetime_fields, request.user.user_timezone)
             # Send the model activity

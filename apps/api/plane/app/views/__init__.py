@@ -175,7 +175,18 @@ from .page.base import (
 )
 from .page.iw_workspace_page import WorkspacePageViewSet
 from .page.iw_page_folder import PageFolderViewSet
-from .issue.iw_epic import IwEpicViewSet, IwEpicListEndpoint
+from .issue.iw_epic import (
+    IwEpicViewSet,
+    IwEpicListEndpoint,
+    IwEpicSubIssuesEndpoint,
+    IwEpicActivityEndpoint,
+    IwEpicCommentViewSet,
+    IwEpicReactionViewSet,
+    IwEpicLinkViewSet,
+    IwEpicAttachmentEndpoint,
+    IwEpicAttachmentV2Endpoint,
+    IwEpicUserDisplayPropertyEndpoint,
+)
 from .page.version import PageVersionEndpoint
 
 from .search.base import GlobalSearchEndpoint, SearchEndpoint

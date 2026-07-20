@@ -39,6 +39,7 @@ from plane.db.models import (
     ProjectMember,
     Workspace,
 )
+from plane.iw.gating import assert_epics_enabled, assert_project_epics_enabled
 from plane.utils.host import base_host
 
 
@@ -75,6 +76,7 @@ class EpicListCreateAPIEndpoint(BaseAPIView):
 
     def get(self, request, slug, project_id):
         """List epics in a project (paginated)."""
+        assert_project_epics_enabled(slug, project_id)
 
         # Custom ordering for priority and state
         priority_order = ["urgent", "high", "medium", "low", "none"]
@@ -188,6 +190,7 @@ class EpicListCreateAPIEndpoint(BaseAPIView):
         need to know the type_id.
         """
         project = Project.objects.get(pk=project_id)
+        assert_epics_enabled(project)
         workspace = Workspace.objects.get(slug=slug)
 
         # Find or fail: the workspace must have an epic issue type
@@ -301,6 +304,7 @@ class EpicDetailAPIEndpoint(BaseAPIView):
 
     def get(self, request, slug, project_id, pk):
         """Retrieve a single epic."""
+        assert_project_epics_enabled(slug, project_id)
         issue = (
             Issue.issue_objects.annotate(
                 sub_issues_count=Issue.issue_objects.filter(parent=OuterRef("id"))
@@ -318,6 +322,7 @@ class EpicDetailAPIEndpoint(BaseAPIView):
 
     def patch(self, request, slug, project_id, pk):
         """Update an epic."""
+        assert_project_epics_enabled(slug, project_id)
         # Epics cannot have a parent — reject any attempt to set one
         if request.data.get("parent") or request.data.get("parent_id"):
             return Response(
@@ -390,6 +395,7 @@ class EpicDetailAPIEndpoint(BaseAPIView):
 
     def delete(self, request, slug, project_id, pk):
         """Delete an epic."""
+        assert_project_epics_enabled(slug, project_id)
         issue = Issue.objects.get(
             workspace__slug=slug,
             project_id=project_id,
@@ -431,6 +437,8 @@ class EpicAnalyticsAPIEndpoint(BaseAPIView):
     permission_classes = [ProjectEntityPermission]
 
     def get(self, request, slug, project_id, pk):
+        assert_project_epics_enabled(slug, project_id)
+
         # Verify the epic exists
         epic = Issue.issue_objects.filter(
             project_id=project_id,
