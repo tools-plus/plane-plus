@@ -2,8 +2,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/plane-plus-lockup-light.svg">
-    <img src=".github/assets/plane-plus-lockup-dark.svg" alt="Plane Plus" width="460">
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/plane-plus-lockup-light.png">
+    <img src=".github/assets/plane-plus-lockup-dark.png" alt="Plane Plus" width="460">
   </picture>
 </p>
 
