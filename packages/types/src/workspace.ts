@@ -152,6 +152,12 @@ export interface IWorkspaceProjectSearchResult {
   workspace__slug: string;
 }
 
+export interface IWorkspaceWikiPageSearchResult {
+  id: string;
+  name: string;
+  workspace__slug: string;
+}
+
 export interface IWorkspaceSearchResults {
   results: {
     workspace: IWorkspaceSearchResult[];
@@ -161,6 +167,7 @@ export interface IWorkspaceSearchResults {
     module: IWorkspaceDefaultSearchResult[];
     issue_view: IWorkspaceDefaultSearchResult[];
     page: IWorkspacePageSearchResult[];
+    wiki_page: IWorkspaceWikiPageSearchResult[];
   };
 }
 

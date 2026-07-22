@@ -14,7 +14,7 @@ import { AlertModalCore } from "@plane/ui";
 import { cn } from "@plane/utils";
 // hooks
 import { usePageFolders } from "@/hooks/store/use-page-folders";
-import { EPageStoreType, usePageStore } from "@/plane-web/hooks/store";
+import { EPageStoreType, usePageStore } from "@/hooks/store";
 import { useAppRouter } from "@/hooks/use-app-router";
 // local components
 import { FolderContextMenu } from "./iw-folder-context-menu";

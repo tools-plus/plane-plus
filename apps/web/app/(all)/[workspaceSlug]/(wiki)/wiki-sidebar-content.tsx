@@ -21,7 +21,7 @@ import { AlertModalCore } from "@plane/ui";
 import { SidebarNavItem } from "@/components/sidebar/sidebar-navigation";
 import { AppSidebarToggleButton } from "@/components/sidebar/sidebar-toggle-button";
 // store hooks
-import { EPageStoreType, usePageStore } from "@/plane-web/hooks/store";
+import { EPageStoreType, usePageStore } from "@/hooks/store";
 import { usePageFolders } from "@/hooks/store/use-page-folders";
 import { useAppRouter } from "@/hooks/use-app-router";
 // local components
