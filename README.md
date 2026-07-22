@@ -17,12 +17,12 @@
   <b>An AI-agent-first project management platform, built on <a href="https://plane.so">Plane</a>.</b>
 </p>
 <p align="center">
-  by <a href="https://eyriehq.com">EyrieHQ</a>
+  by <a href="https://github.com/tools-plus">Tools Plus</a>
 </p>
 
 <p align="center">
-  <a href="https://eyriehq.com"><b>Website</b></a> •
-  <a href="https://github.com/eyriehq/plane-plus-sdk-mcp"><b>SDK & MCP server</b></a> •
+  <a href="https://github.com/tools-plus"><b>GitHub</b></a> •
+  <a href="https://github.com/tools-plus/plane-plus-sdk-mcp"><b>SDK & MCP server</b></a> •
   <a href="./README-PLANE.md"><b>Upstream Plane README</b></a>
 </p>
 
@@ -88,7 +88,7 @@ projects should stay private.
 ### Companion SDK + MCP server
 
 Every endpoint above is typed and tool-callable via
-[`plane-plus-sdk-mcp`](https://github.com/eyriehq/plane-plus-sdk-mcp) — a Python
+[`plane-plus-sdk-mcp`](https://github.com/tools-plus/plane-plus-sdk-mcp) — a Python
 SDK plus a FastMCP server. AI agents manage Plane workspaces without learning
 the REST surface.
 
@@ -138,7 +138,8 @@ license.
 ## Security
 
 - **Plane Plus-specific modifications** (anything under `plane/iw/…` in the API,
-  or `iw-`-prefixed code): email **security@eyriehq.com**.
+  or `iw-`-prefixed code): open a private security advisory via
+  [GitHub](https://github.com/tools-plus/plane-plus/security/advisories/new).
 - **Upstream Plane code**: please use upstream's channels — see
   [upstream security policy](https://github.com/makeplane/plane/blob/master/SECURITY.md).
 
@@ -152,5 +153,5 @@ additions (agent APIs, MCP integration, SDK features) belong here.
 
 <p align="center">
   <em>Plane Plus is developed and maintained by
-  <a href="https://eyriehq.com">EyrieHQ</a>.</em>
+  <a href="https://github.com/tools-plus">Tools Plus</a>.</em>
 </p>
