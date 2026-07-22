@@ -18,6 +18,7 @@ import { ContextMenu, CustomMenu } from "@plane/ui";
 // components
 import { cn } from "@plane/utils";
 import { DeletePageModal } from "@/components/pages/modals/delete-page-modal";
+import { MovePageModal } from "@/components/pages/modals/move-page-modal";
 // hooks
 import { usePageOperations } from "@/hooks/use-page-operations";
 import { EPageStoreType } from "@/hooks/store";
@@ -178,6 +179,7 @@ export const PageActions = observer(function PageActions(props: Props) {
 
   return (
     <>
+      <MovePageModal isOpen={movePageModal} onClose={() => setMovePageModal(false)} page={page} />
       <DeletePageModal
         isOpen={deletePageModal}
         onClose={() => setDeletePageModal(false)}

@@ -90,9 +90,6 @@ const KanbanIssueDetailsBlock = observer(function KanbanIssueDetailsBlock(props:
     </button>
   );
 
-  // derived values
-  const subIssueCount = issue?.sub_issues_count ?? 0;
-
   useOutsideClickDetector(menuActionRef, () => setIsMenuActive(false));
 
   return (
