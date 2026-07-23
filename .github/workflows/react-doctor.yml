@@ -46,7 +46,7 @@ jobs:
   react-doctor:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           # React Doctor diffs against the merge base to report only what a PR
           # introduces. The default shallow checkout has no merge base, so it
