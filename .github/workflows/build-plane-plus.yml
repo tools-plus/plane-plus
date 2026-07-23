@@ -39,12 +39,23 @@ jobs:
       image_tag: ${{ steps.vars.outputs.image_tag }}
       is_release: ${{ steps.vars.outputs.is_release }}
       is_prerelease: ${{ steps.vars.outputs.is_prerelease }}
+      is_main: ${{ steps.vars.outputs.is_main }}
     steps:
       - name: Set build variables
         id: vars
         run: |
           BUILD_TYPE="${{ github.event.inputs.build_type }}"
           IS_PRERELEASE="${{ github.event.inputs.is_prerelease }}"
+
+          # Shared tags (stable/latest/nightly) are only ever published from main.
+          # This workflow is workflow_dispatch, so it can be run from any branch —
+          # without this gate a Release cut from a feature branch would claim them.
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            echo "is_main=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_main=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Not on main (${{ github.ref_name }}) — no stable/latest/nightly tag will be published"
+          fi
 
           if [ "$BUILD_TYPE" == "Release" ]; then
             REL_VERSION="${{ github.event.inputs.release_version }}"
@@ -125,17 +136,27 @@ jobs:
           TAG="${{ needs.setup.outputs.image_tag }}"
           IS_RELEASE="${{ needs.setup.outputs.is_release }}"
           IS_PRERELEASE="${{ needs.setup.outputs.is_prerelease }}"
+          IS_MAIN="${{ needs.setup.outputs.is_main }}"
 
+          # Every build gets its own immutable tag (version for a Release, branch
+          # name for a Build). The three shared, moving tags are published only
+          # from main:
+          #   latest  = newest release, prereleases included
+          #   stable  = newest full release, prereleases excluded
+          #   nightly = newest build off main
           TAGS="${ORG}/${IMAGE}:${TAG}"
 
-          if [ "$IS_RELEASE" == "true" ] && [ "$IS_PRERELEASE" != "true" ]; then
-            # Full release: version + stable
-            TAGS="${TAGS},${ORG}/${IMAGE}:stable"
-          elif [ "$IS_RELEASE" != "true" ] && [ "$TAG" == "main" ]; then
-            # Branch build from main: branch-name + latest
-            TAGS="${TAGS},${ORG}/${IMAGE}:latest"
+          if [ "$IS_MAIN" == "true" ]; then
+            if [ "$IS_RELEASE" == "true" ]; then
+              TAGS="${TAGS},${ORG}/${IMAGE}:latest"
+              if [ "$IS_PRERELEASE" != "true" ]; then
+                TAGS="${TAGS},${ORG}/${IMAGE}:stable"
+              fi
+            else
+              TAGS="${TAGS},${ORG}/${IMAGE}:nightly"
+            fi
           fi
-          # Prerelease or non-main branch: version/branch tag only
+          # Off main: the version/branch tag only — never a shared tag.
 
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
 
