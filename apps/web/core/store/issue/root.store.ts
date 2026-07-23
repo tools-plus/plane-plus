@@ -17,6 +17,8 @@ import type { IWorkspaceMembership } from "@/store/member/workspace/workspace-me
 // issues data store
 import type { IArchivedIssuesFilter, IArchivedIssues } from "./archived";
 import { ArchivedIssuesFilter, ArchivedIssues } from "./archived";
+import type { IProjectEpicsFilter, IProjectEpics } from "./epic";
+import { ProjectEpicsFilter, ProjectEpics } from "./epic";
 import type { ICycleIssuesFilter, ICycleIssues } from "./cycle";
 import { CycleIssuesFilter, CycleIssues } from "./cycle";
 import type { IIssueStore } from "./issue.store";
@@ -104,8 +106,8 @@ export interface IIssueRootStore {
   issueKanBanView: IIssueKanBanViewStore;
   issueCalendarView: ICalendarStore;
 
-  projectEpicsFilter: IProjectIssuesFilter;
-  projectEpics: IProjectIssues;
+  projectEpicsFilter: IProjectEpicsFilter;
+  projectEpics: IProjectEpics;
 }
 
 export class IssueRootStore implements IIssueRootStore {
@@ -172,8 +174,8 @@ export class IssueRootStore implements IIssueRootStore {
   issueKanBanView: IIssueKanBanViewStore;
   issueCalendarView: ICalendarStore;
 
-  projectEpicsFilter: IProjectIssuesFilter;
-  projectEpics: IProjectIssues;
+  projectEpicsFilter: IProjectEpicsFilter;
+  projectEpics: IProjectEpics;
 
   constructor(rootStore: RootStore, serviceType: TIssueServiceType = EIssueServiceType.ISSUES) {
     makeObservable(this, {
@@ -263,7 +265,7 @@ export class IssueRootStore implements IIssueRootStore {
     this.issueKanBanView = new IssueKanBanViewStore(this);
     this.issueCalendarView = new CalendarStore(this);
 
-    this.projectEpicsFilter = new ProjectIssuesFilter(this);
-    this.projectEpics = new ProjectIssues(this, this.projectEpicsFilter);
+    this.projectEpicsFilter = new ProjectEpicsFilter(this);
+    this.projectEpics = new ProjectEpics(this, this.projectEpicsFilter);
   }
 }
