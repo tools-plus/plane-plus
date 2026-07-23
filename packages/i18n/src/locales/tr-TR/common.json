@@ -212,6 +212,7 @@
   "congrats": "Tebrikler!",
   "open_project": "Projeyi aç",
   "issues": "İş Öğeleri",
+  "epics": "Epics",
   "cycles": "Döngüler",
   "modules": "Modüller",
   "pages": "Sayfalar",
@@ -227,6 +228,7 @@
   "views_description": "Özel sıralamaları, filtreleri ve görüntüleme seçeneklerini kaydedin veya ekibinizle paylaşın.",
   "pages_description": "Serbest biçimli içerikler oluşturun ve düzenleyin; notlar, belgeler, her şey.",
   "intake_description": "Üye olmayanların hata, geri bildirim ve öneri paylaşmasına izin verin; iş akışınızı bozmadan.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "İş öğeleri ve projelerde harcanan zamanı kaydedin.",
   "work_management_description": "İşlerinizi ve projelerinizi kolayca yönetin.",
   "documentation": "Dokümantasyon",
@@ -264,8 +266,10 @@
   "confirming": "Onaylanıyor",
   "draft_created": "Taslak oluşturuldu",
   "issue_created_successfully": "İş öğesi başarıyla oluşturuldu",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Taslak oluşturulamadı",
   "issue_creation_failed": "İş öğesi oluşturulamadı",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Taslak İş Öğesi",
   "issue_updated_successfully": "İş öğesi başarıyla güncellendi",
   "issue_could_not_be_updated": "İş öğesi güncellenemedi",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "İş öğelerini JSON dosyasına aktarın.",
       "short_description": "JSON olarak aktar"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

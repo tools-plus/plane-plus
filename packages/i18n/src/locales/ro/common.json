@@ -212,6 +212,7 @@
   "congrats": "Felicitări!",
   "open_project": "Deschide proiectul",
   "issues": "Activități",
+  "epics": "Epics",
   "cycles": "Cicluri",
   "modules": "Module",
   "pages": "Documentație",
@@ -227,6 +228,7 @@
   "views_description": "Salvează sortările, filtrele și opțiunile de afișare personalizate sau distribuie-le echipei tale.",
   "pages_description": "Creează și editează conținut liber: note, documente, orice.",
   "intake_description": "Permite utilizatorilor care nu sunt membri să trimită erori, feedback și sugestii fără a perturba fluxul de lucru.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "Înregistrează timpul petrecut pe activități și proiecte.",
   "work_management_description": "Gestionează-ți munca și proiectele cu ușurință.",
   "documentation": "Documentație",
@@ -264,8 +266,10 @@
   "confirming": "Se confirmă",
   "draft_created": "Schiță creată",
   "issue_created_successfully": "Activitate creată cu succes",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Crearea schiței a eșuat",
   "issue_creation_failed": "Crearea activității a eșuat",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Schiță activitate",
   "issue_updated_successfully": "Activitate actualizată cu succes",
   "issue_could_not_be_updated": "Activitatea nu a putut fi actualizată",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "Exportă activitățile într-un fișier JSON.",
       "short_description": "Exportă ca JSON"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

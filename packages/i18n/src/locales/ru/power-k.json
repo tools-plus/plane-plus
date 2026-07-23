@@ -113,6 +113,10 @@
     },
     "miscellaneous_actions": {
       "toggle_app_sidebar": "Переключить боковую панель приложения",
+      "side_rail_icon_only": "Side Rail: Icon only",
+      "side_rail_icon_with_label": "Side Rail: Icon with text",
+      "side_rail_show": "Side Rail: Show",
+      "side_rail_hide": "Side Rail: Hide",
       "copy_current_page_url": "Копировать URL текущей страницы",
       "copy_current_page_url_toast_success": "URL текущей страницы скопирован в буфер обмена.",
       "copy_current_page_url_toast_error": "Произошла ошибка при копировании URL текущей страницы в буфер обмена.",

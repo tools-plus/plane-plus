@@ -212,6 +212,7 @@
   "congrats": "Herzlichen Glückwunsch!",
   "open_project": "Projekt öffnen",
   "issues": "Arbeitselemente",
+  "epics": "Epics",
   "cycles": "Zyklen",
   "modules": "Module",
   "pages": "Seiten",
@@ -227,6 +228,7 @@
   "views_description": "Speichern Sie benutzerdefinierte Sortierungen, Filter und Anzeigeoptionen oder teilen Sie sie mit Ihrem Team.",
   "pages_description": "Erstellen und bearbeiten Sie frei formulierte Inhalte – Notizen, Dokumente, alles Mögliche.",
   "intake_description": "Erlauben Sie Nicht-Mitgliedern, Bugs, Feedback und Vorschläge zu teilen – ohne Ihren Arbeitsablauf zu stören.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "Erfassen Sie die auf Arbeitselemente und Projekte verwendete Zeit.",
   "work_management_description": "Verwalten Sie Ihre Arbeit und Projekte mühelos.",
   "documentation": "Dokumentation",
@@ -264,8 +266,10 @@
   "confirming": "Wird bestätigt",
   "draft_created": "Entwurf erstellt",
   "issue_created_successfully": "Arbeitselement erfolgreich erstellt",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Erstellung des Entwurfs fehlgeschlagen",
   "issue_creation_failed": "Erstellung des Arbeitselements fehlgeschlagen",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Entwurf eines Arbeitselements",
   "issue_updated_successfully": "Arbeitselement erfolgreich aktualisiert",
   "issue_could_not_be_updated": "Arbeitselement konnte nicht aktualisiert werden",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "Arbeitselemente in JSON exportieren.",
       "short_description": "Als JSON exportieren"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

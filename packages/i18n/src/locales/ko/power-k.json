@@ -113,6 +113,10 @@
     },
     "miscellaneous_actions": {
       "toggle_app_sidebar": "앱 사이드바 전환",
+      "side_rail_icon_only": "Side Rail: Icon only",
+      "side_rail_icon_with_label": "Side Rail: Icon with text",
+      "side_rail_show": "Side Rail: Show",
+      "side_rail_hide": "Side Rail: Hide",
       "copy_current_page_url": "현재 페이지 URL 복사",
       "copy_current_page_url_toast_success": "현재 페이지 URL이 클립보드에 복사되었습니다.",
       "copy_current_page_url_toast_error": "현재 페이지 URL을 클립보드에 복사하는 중 오류가 발생했습니다.",

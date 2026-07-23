@@ -113,6 +113,10 @@
     },
     "miscellaneous_actions": {
       "toggle_app_sidebar": "Przełącz pasek boczny aplikacji",
+      "side_rail_icon_only": "Side Rail: Icon only",
+      "side_rail_icon_with_label": "Side Rail: Icon with text",
+      "side_rail_show": "Side Rail: Show",
+      "side_rail_hide": "Side Rail: Hide",
       "copy_current_page_url": "Kopiuj URL bieżącej strony",
       "copy_current_page_url_toast_success": "URL bieżącej strony skopiowano do schowka.",
       "copy_current_page_url_toast_error": "Wystąpił błąd podczas kopiowania URL bieżącej strony do schowka.",

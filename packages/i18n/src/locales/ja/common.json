@@ -212,6 +212,7 @@
   "congrats": "おめでとうございます！",
   "open_project": "プロジェクトを開く",
   "issues": "作業項目",
+  "epics": "Epics",
   "cycles": "Cycles",
   "modules": "Modules",
   "pages": "ページ",
@@ -227,6 +228,7 @@
   "views_description": "カスタムの並び替え、フィルター、表示オプションを保存するか、チームと共有します。",
   "pages_description": "自由形式のコンテンツを作成・編集できます。メモ、ドキュメント、何でもOKです。",
   "intake_description": "非メンバーがバグ、フィードバック、提案を共有できるようにし、ワークフローを妨げないようにします。",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "作業項目やプロジェクトに費やした時間を記録します。",
   "work_management_description": "作業とプロジェクトを簡単に管理します。",
   "documentation": "ドキュメント",
@@ -264,8 +266,10 @@
   "confirming": "確認中",
   "draft_created": "下書きが作成されました",
   "issue_created_successfully": "作業項目が正常に作成されました",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "下書きの作成に失敗しました",
   "issue_creation_failed": "作業項目の作成に失敗しました",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "作業項目の下書き",
   "issue_updated_successfully": "作業項目が正常に更新されました",
   "issue_could_not_be_updated": "作業項目を更新できませんでした",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "作業項目をJSONファイルにエクスポートします。",
       "short_description": "JSONとしてエクスポート"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

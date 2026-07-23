@@ -212,6 +212,7 @@
   "congrats": "Gratulujeme!",
   "open_project": "Otevřít projekt",
   "issues": "Pracovní položky",
+  "epics": "Epics",
   "cycles": "Cykly",
   "modules": "Moduly",
   "pages": "Stránky",
@@ -227,6 +228,7 @@
   "views_description": "Uložte vlastní řazení, filtry a možnosti zobrazení nebo je sdílejte se svým týmem.",
   "pages_description": "Vytvářejte a upravujte volně strukturovaný obsah – poznámky, dokumenty, cokoli.",
   "intake_description": "Umožněte nečlenům sdílet chyby, zpětnou vazbu a návrhy, aniž by narušili váš pracovní postup.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "Zaznamenávejte čas strávený na pracovních položkách a projektech.",
   "work_management_description": "Spravujte svou práci a projekty snadno.",
   "documentation": "Dokumentace",
@@ -264,8 +266,10 @@
   "confirming": "Potvrzování",
   "draft_created": "Koncept vytvořen",
   "issue_created_successfully": "Pracovní položka úspěšně vytvořena",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Vytvoření konceptu se nezdařilo",
   "issue_creation_failed": "Vytvoření pracovní položky se nezdařilo",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Koncept pracovní položky",
   "issue_updated_successfully": "Pracovní položka úspěšně aktualizována",
   "issue_could_not_be_updated": "Aktualizace pracovní položky se nezdařila",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "Exportujte položky do JSON.",
       "short_description": "Exportovat jako JSON"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

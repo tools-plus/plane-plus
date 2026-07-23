@@ -212,6 +212,7 @@
   "congrats": "恭喜！",
   "open_project": "打开项目",
   "issues": "工作项",
+  "epics": "Epics",
   "cycles": "周期",
   "modules": "模块",
   "pages": "页面",
@@ -227,6 +228,7 @@
   "views_description": "保存自定义排序、筛选和显示选项，或与团队共享。",
   "pages_description": "创建和编辑自由格式的内容：笔记、文档，任何内容。",
   "intake_description": "允许非成员提交 Bug、反馈和建议，且不会干扰您的工作流程。",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "记录在工作项和项目上花费的时间。",
   "work_management_description": "轻松管理您的工作和项目。",
   "documentation": "文档",
@@ -264,8 +266,10 @@
   "confirming": "确认中",
   "draft_created": "草稿已创建",
   "issue_created_successfully": "工作项创建成功",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "草稿创建失败",
   "issue_creation_failed": "工作项创建失败",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "草稿工作项",
   "issue_updated_successfully": "工作项更新成功",
   "issue_could_not_be_updated": "工作项无法更新",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "将工作项导出为 JSON 文件。",
       "short_description": "导出为 JSON"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

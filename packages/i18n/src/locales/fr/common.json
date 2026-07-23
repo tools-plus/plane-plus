@@ -212,6 +212,7 @@
   "congrats": "Félicitations !",
   "open_project": "Ouvrir le projet",
   "issues": "Éléments de travail",
+  "epics": "Epics",
   "cycles": "Cycles",
   "modules": "Modules",
   "pages": "Pages",
@@ -227,6 +228,7 @@
   "views_description": "Enregistrez des tris, filtres et options d’affichage personnalisés ou partagez-les avec votre équipe.",
   "pages_description": "Créez et modifiez du contenu libre : notes, documents, tout ce que vous voulez.",
   "intake_description": "Permettez aux non-membres de partager des bugs, des retours et des suggestions, sans perturber votre flux de travail.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "Enregistrez le temps passé sur les éléments de travail et les projets.",
   "work_management_description": "Gérez votre travail et vos projets facilement.",
   "documentation": "Documentation",
@@ -264,8 +266,10 @@
   "confirming": "Confirmation",
   "draft_created": "Brouillon créé",
   "issue_created_successfully": "Élément de travail créé avec succès",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Échec de la création du brouillon",
   "issue_creation_failed": "Échec de la création de l’élément de travail",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Élément de travail en brouillon",
   "issue_updated_successfully": "Élément de travail mis à jour avec succès",
   "issue_could_not_be_updated": "L’élément de travail n’a pas pu être mis à jour",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "Exportez les éléments de travail vers un fichier JSON.",
       "short_description": "Exporter en json"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

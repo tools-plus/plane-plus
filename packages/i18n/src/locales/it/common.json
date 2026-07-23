@@ -212,6 +212,7 @@
   "congrats": "Congratulazioni!",
   "open_project": "Apri progetto",
   "issues": "Elementi di lavoro",
+  "epics": "Epics",
   "cycles": "Cicli",
   "modules": "Moduli",
   "pages": "Pagine",
@@ -227,6 +228,7 @@
   "views_description": "Salva ordinamenti, filtri e opzioni di visualizzazione personalizzati o condividili con il tuo team.",
   "pages_description": "Crea e modifica contenuti liberi: appunti, documenti, qualsiasi cosa.",
   "intake_description": "Consenti ai non membri di segnalare bug, feedback e suggerimenti senza interrompere il tuo flusso di lavoro.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "Registra il tempo trascorso su elementi di lavoro e progetti.",
   "work_management_description": "Gestisci il tuo lavoro e i tuoi progetti con facilità.",
   "documentation": "Documentazione",
@@ -264,8 +266,10 @@
   "confirming": "Conferma in corso",
   "draft_created": "Bozza creata",
   "issue_created_successfully": "Elemento di lavoro creato con successo",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Creazione della bozza fallita",
   "issue_creation_failed": "Creazione dell'elemento di lavoro fallita",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Bozza di elemento di lavoro",
   "issue_updated_successfully": "Elemento di lavoro aggiornato con successo",
   "issue_could_not_be_updated": "Impossibile aggiornare l'elemento di lavoro",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "Esporta elementi di lavoro in un file JSON.",
       "short_description": "Esporta come JSON"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

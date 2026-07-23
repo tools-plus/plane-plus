@@ -113,6 +113,10 @@
     },
     "miscellaneous_actions": {
       "toggle_app_sidebar": "Alternar barra lateral de la aplicación",
+      "side_rail_icon_only": "Side Rail: Icon only",
+      "side_rail_icon_with_label": "Side Rail: Icon with text",
+      "side_rail_show": "Side Rail: Show",
+      "side_rail_hide": "Side Rail: Hide",
       "copy_current_page_url": "Copiar URL de la página actual",
       "copy_current_page_url_toast_success": "URL de la página actual copiada al portapapeles.",
       "copy_current_page_url_toast_error": "Ocurrió un error al copiar la URL de la página actual al portapapeles.",

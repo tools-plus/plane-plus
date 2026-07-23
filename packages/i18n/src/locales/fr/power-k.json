@@ -113,6 +113,10 @@
     },
     "miscellaneous_actions": {
       "toggle_app_sidebar": "Basculer la barre latérale de l’application",
+      "side_rail_icon_only": "Side Rail: Icon only",
+      "side_rail_icon_with_label": "Side Rail: Icon with text",
+      "side_rail_show": "Side Rail: Show",
+      "side_rail_hide": "Side Rail: Hide",
       "copy_current_page_url": "Copier l’URL de la page actuelle",
       "copy_current_page_url_toast_success": "URL de la page actuelle copiée dans le presse-papiers.",
       "copy_current_page_url_toast_error": "Une erreur s’est produite lors de la copie de l’URL de la page actuelle dans le presse-papiers.",

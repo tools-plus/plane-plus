@@ -113,6 +113,10 @@
     },
     "miscellaneous_actions": {
       "toggle_app_sidebar": "切换应用侧边栏",
+      "side_rail_icon_only": "Side Rail: Icon only",
+      "side_rail_icon_with_label": "Side Rail: Icon with text",
+      "side_rail_show": "Side Rail: Show",
+      "side_rail_hide": "Side Rail: Hide",
       "copy_current_page_url": "复制当前页面 URL",
       "copy_current_page_url_toast_success": "当前页面 URL 已复制到剪贴板。",
       "copy_current_page_url_toast_error": "复制当前页面 URL 到剪贴板时出错。",

@@ -212,6 +212,7 @@
   "congrats": "Parabéns!",
   "open_project": "Abrir projeto",
   "issues": "Itens de trabalho",
+  "epics": "Epics",
   "cycles": "Ciclos",
   "modules": "Módulos",
   "pages": "Páginas",
@@ -227,6 +228,7 @@
   "views_description": "Salve classificações, filtros e opções de exibição personalizadas ou compartilhe com sua equipe.",
   "pages_description": "Crie e edite conteúdo livre – anotações, documentos, qualquer coisa.",
   "intake_description": "Permita que não membros compartilhem bugs, feedbacks e sugestões sem interromper seu fluxo de trabalho.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "Registre o tempo gasto em itens de trabalho e projetos.",
   "work_management_description": "Gerencie seu trabalho e projetos com facilidade.",
   "documentation": "Documentação",
@@ -264,8 +266,10 @@
   "confirming": "Confirmando",
   "draft_created": "Rascunho criado",
   "issue_created_successfully": "Item de trabalho criado com sucesso",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Falha na criação do rascunho",
   "issue_creation_failed": "Falha na criação do item de trabalho",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Rascunhar item de trabalho",
   "issue_updated_successfully": "Item de trabalho atualizado com sucesso",
   "issue_could_not_be_updated": "Não foi possível atualizar o item de trabalho",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "Exporte itens de trabalho para um arquivo JSON.",
       "short_description": "Exportar como JSON"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

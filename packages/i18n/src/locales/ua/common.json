@@ -212,6 +212,7 @@
   "congrats": "Вітаємо!",
   "open_project": "Відкрити проєкт",
   "issues": "Робочі одиниці",
+  "epics": "Epics",
   "cycles": "Цикли",
   "modules": "Модулі",
   "pages": "Сторінки",
@@ -227,6 +228,7 @@
   "views_description": "Зберігайте власні сортування, фільтри та варіанти відображення або діліться ними з командою.",
   "pages_description": "Створюйте та редагуйте довільний вміст: нотатки, документи, що завгодно.",
   "intake_description": "Дозвольте неучасникам ділитися помилками, відгуками й пропозиціями без порушення робочого процесу.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "Фіксуйте час, витрачений на робочі одиниці та проєкти.",
   "work_management_description": "Зручно керуйте своєю роботою та проєктами.",
   "documentation": "Документація",
@@ -264,8 +266,10 @@
   "confirming": "Підтвердження",
   "draft_created": "Чернетку створено",
   "issue_created_successfully": "Робочу одиницю успішно створено",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Не вдалося створити чернетку",
   "issue_creation_failed": "Не вдалося створити робочу одиницю",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Чернетка робочої одиниці",
   "issue_updated_successfully": "Робочу одиницю успішно оновлено",
   "issue_could_not_be_updated": "Не вдалося оновити робочу одиницю",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "Експортуйте одиниці у формат JSON.",
       "short_description": "Експортувати як JSON"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

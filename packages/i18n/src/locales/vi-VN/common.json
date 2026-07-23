@@ -212,6 +212,7 @@
   "congrats": "Chúc mừng!",
   "open_project": "Mở dự án",
   "issues": "Mục công việc",
+  "epics": "Epics",
   "cycles": "Chu kỳ",
   "modules": "Mô-đun",
   "pages": "Trang",
@@ -227,6 +228,7 @@
   "views_description": "Lưu các tùy chọn sắp xếp, lọc và hiển thị tùy chỉnh hoặc chia sẻ chúng với nhóm của bạn.",
   "pages_description": "Tạo và chỉnh sửa nội dung tự do: ghi chú, tài liệu, bất cứ thứ gì.",
   "intake_description": "Cho phép người không phải thành viên chia sẻ lỗi, phản hồi và đề xuất mà không làm gián đoạn quy trình làm việc của bạn.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "Ghi lại thời gian dành cho các mục công việc và dự án.",
   "work_management_description": "Quản lý công việc và dự án của bạn một cách dễ dàng.",
   "documentation": "Tài liệu",
@@ -264,8 +266,10 @@
   "confirming": "Đang xác nhận",
   "draft_created": "Đã tạo bản nháp",
   "issue_created_successfully": "Đã tạo mục công việc thành công",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Tạo bản nháp thất bại",
   "issue_creation_failed": "Tạo mục công việc thất bại",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Mục công việc nháp",
   "issue_updated_successfully": "Đã cập nhật mục công việc thành công",
   "issue_could_not_be_updated": "Không thể cập nhật mục công việc",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "Xuất mục công việc thành tệp JSON.",
       "short_description": "Xuất sang JSON"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

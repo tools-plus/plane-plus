@@ -212,6 +212,7 @@
   "congrats": "Gratulacje!",
   "open_project": "Otwórz projekt",
   "issues": "Elementy pracy",
+  "epics": "Epics",
   "cycles": "Cykle",
   "modules": "Moduły",
   "pages": "Strony",
@@ -227,6 +228,7 @@
   "views_description": "Zapisz niestandardowe sortowania, filtry i opcje wyświetlania lub udostępnij je zespołowi.",
   "pages_description": "Twórz i edytuj treści o swobodnej formie – notatki, dokumenty, cokolwiek.",
   "intake_description": "Pozwól osobom spoza zespołu zgłaszać błędy, opinie i sugestie bez zakłócania przepływu pracy.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "Rejestruj czas spędzony na elementach pracy i projektach.",
   "work_management_description": "Łatwo zarządzaj swoją pracą i projektami.",
   "documentation": "Dokumentacja",
@@ -264,8 +266,10 @@
   "confirming": "Potwierdzanie",
   "draft_created": "Szkic utworzony",
   "issue_created_successfully": "Element pracy utworzony pomyślnie",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Nie udało się utworzyć szkicu",
   "issue_creation_failed": "Nie udało się utworzyć elementu pracy",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Szkic elementu pracy",
   "issue_updated_successfully": "Element pracy zaktualizowano pomyślnie",
   "issue_could_not_be_updated": "Nie udało się zaktualizować elementu pracy",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "Eksportuj elementy do pliku JSON.",
       "short_description": "Eksportuj jako JSON"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

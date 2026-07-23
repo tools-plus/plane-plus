@@ -410,6 +410,13 @@
           }
         }
       },
+      "epics": {
+        "title": "Epics",
+        "short_title": "Epics",
+        "description": "Group and track large features that span multiple work items.",
+        "toggle_title": "Enable epics",
+        "toggle_description": "Project members will be able to create and manage epics."
+      },
       "time_tracking": {
         "title": "Urmărire timp",
         "short_title": "Urmărire timp",

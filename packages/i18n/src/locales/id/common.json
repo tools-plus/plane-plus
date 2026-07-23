@@ -212,6 +212,7 @@
   "congrats": "Selamat!",
   "open_project": "Buka proyek",
   "issues": "Item kerja",
+  "epics": "Epics",
   "cycles": "Siklus",
   "modules": "Modul",
   "pages": "Halaman",
@@ -227,6 +228,7 @@
   "views_description": "Simpan pengurutan, filter, dan opsi tampilan khusus atau bagikan dengan tim Anda.",
   "pages_description": "Buat dan edit konten bebas bentuk: catatan, dokumen, apa saja.",
   "intake_description": "Izinkan non-anggota membagikan bug, masukan, dan saran tanpa mengganggu alur kerja Anda.",
+  "epics_description": "Group and track large features that span multiple work items.",
   "time_tracking_description": "Catat waktu yang dihabiskan untuk item kerja dan proyek.",
   "work_management_description": "Kelola pekerjaan dan proyek Anda dengan mudah.",
   "documentation": "Dokumentasi",
@@ -264,8 +266,10 @@
   "confirming": "Mengonfirmasi",
   "draft_created": "Draf dibuat",
   "issue_created_successfully": "Item kerja berhasil dibuat",
+  "epic_created_successfully": "Epic created successfully",
   "draft_creation_failed": "Pembuatan draf gagal",
   "issue_creation_failed": "Pembuatan item kerja gagal",
+  "epic_creation_failed": "Epic creation failed",
   "draft_issue": "Draf item kerja",
   "issue_updated_successfully": "Item kerja berhasil diperbarui",
   "issue_could_not_be_updated": "Item kerja tidak dapat diperbarui",
@@ -866,6 +870,24 @@
       "title": "JSON",
       "description": "Ekspor item kerja ke file JSON.",
       "short_description": "Ekspor sebagai json"
+    }
+  },
+  "iw": {
+    "app_switcher": {
+      "tooltip": "Switch app",
+      "aria_label": "Open app switcher",
+      "projects": "Projects",
+      "wiki": "Wiki",
+      "ai": "AI",
+      "settings": "Settings",
+      "dock_app_rail": "Dock App Rail",
+      "undock_app_rail": "Undock App Rail"
+    },
+    "power_k": {
+      "nav_app_projects": "Go to Projects",
+      "nav_app_wiki": "Go to Wiki",
+      "nav_app_ai": "Go to AI",
+      "nav_app_settings": "Go to Settings"
     }
   }
 }

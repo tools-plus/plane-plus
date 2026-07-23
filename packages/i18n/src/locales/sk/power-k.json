@@ -113,6 +113,10 @@
     },
     "miscellaneous_actions": {
       "toggle_app_sidebar": "Prepnúť bočný panel aplikácie",
+      "side_rail_icon_only": "Side Rail: Icon only",
+      "side_rail_icon_with_label": "Side Rail: Icon with text",
+      "side_rail_show": "Side Rail: Show",
+      "side_rail_hide": "Side Rail: Hide",
       "copy_current_page_url": "Kopírovať URL aktuálnej stránky",
       "copy_current_page_url_toast_success": "URL aktuálnej stránky bola skopírovaná do schránky.",
       "copy_current_page_url_toast_error": "Pri kopírovaní URL aktuálnej stránky do schránky sa vyskytla chyba.",

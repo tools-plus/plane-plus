@@ -113,6 +113,10 @@
     },
     "miscellaneous_actions": {
       "toggle_app_sidebar": "切換應用程式側邊欄",
+      "side_rail_icon_only": "Side Rail: Icon only",
+      "side_rail_icon_with_label": "Side Rail: Icon with text",
+      "side_rail_show": "Side Rail: Show",
+      "side_rail_hide": "Side Rail: Hide",
       "copy_current_page_url": "複製目前頁面 URL",
       "copy_current_page_url_toast_success": "目前頁面 URL 已複製到剪貼簿。",
       "copy_current_page_url_toast_error": "複製目前頁面 URL 至剪貼簿時發生錯誤。",

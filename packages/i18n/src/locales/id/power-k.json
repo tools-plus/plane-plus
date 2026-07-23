@@ -113,6 +113,10 @@
     },
     "miscellaneous_actions": {
       "toggle_app_sidebar": "Alihkan sidebar aplikasi",
+      "side_rail_icon_only": "Side Rail: Icon only",
+      "side_rail_icon_with_label": "Side Rail: Icon with text",
+      "side_rail_show": "Side Rail: Show",
+      "side_rail_hide": "Side Rail: Hide",
       "copy_current_page_url": "Salin URL halaman saat ini",
       "copy_current_page_url_toast_success": "URL halaman saat ini disalin ke clipboard.",
       "copy_current_page_url_toast_error": "Terjadi kesalahan saat menyalin URL halaman saat ini ke clipboard.",
