@@ -181,9 +181,9 @@ jobs:
           mkdir -p deploy-assets
           IMG_TAG="${{ needs.setup.outputs.image_tag }}"
           cp deployments/plane-plus/install.sh deploy-assets/install.sh
-          sed "s/\${APP_RELEASE:-latest}/\${APP_RELEASE:-${IMG_TAG}}/g" \
+          sed "s/\${APP_RELEASE:-stable}/\${APP_RELEASE:-${IMG_TAG}}/g" \
             deployments/plane-plus/docker-compose.yml > deploy-assets/docker-compose.yml
-          sed "s/^APP_RELEASE=latest/APP_RELEASE=${IMG_TAG}/g" \
+          sed "s/^APP_RELEASE=stable/APP_RELEASE=${IMG_TAG}/g" \
             deployments/plane-plus/variables.env > deploy-assets/variables.env
 
       - name: Upload as workflow artifact
