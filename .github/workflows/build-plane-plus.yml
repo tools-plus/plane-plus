@@ -1,4 +1,4 @@
-name: Build & Push EyrieHQ Plane Images
+name: Build & Push Plane Plus
 
 on:
   workflow_dispatch:
@@ -28,13 +28,13 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DOCKER_ORG: eyriehq
+  DOCKER_ORG: osstoolsplus
   DOCKER_BUILDKIT: 1
 
 jobs:
   setup:
     name: Build Setup
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       image_tag: ${{ steps.vars.outputs.image_tag }}
       is_release: ${{ steps.vars.outputs.is_release }}
@@ -74,7 +74,7 @@ jobs:
 
   build:
     name: Build ${{ matrix.image }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [setup]
     strategy:
       fail-fast: false
@@ -82,13 +82,13 @@ jobs:
         include:
           - image: plane-web
             context: .
-            dockerfile: ./apps/web/Dockerfile.iw-web
+            dockerfile: ./apps/web/Dockerfile.pp-web
           - image: plane-space
             context: .
-            dockerfile: ./apps/space/Dockerfile.iw-space
+            dockerfile: ./apps/space/Dockerfile.pp-space
           - image: plane-admin
             context: .
-            dockerfile: ./apps/admin/Dockerfile.iw-admin
+            dockerfile: ./apps/admin/Dockerfile.pp-admin
           - image: plane-live
             context: .
             dockerfile: ./apps/live/Dockerfile.live
@@ -150,7 +150,7 @@ jobs:
 
   upload-assets:
     name: Upload Deploy Assets
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [setup, build]
     steps:
       - uses: actions/checkout@v6
@@ -173,7 +173,7 @@ jobs:
 
   release:
     name: Create Release
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: needs.setup.outputs.is_release == 'true'
     needs: [setup, upload-assets]
     steps:
@@ -197,7 +197,7 @@ jobs:
 
   summary:
     name: Build Summary
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: always()
     needs: [setup, build]
     steps:
@@ -211,5 +211,5 @@ jobs:
           echo "| Image | Tag |" >> "$GITHUB_STEP_SUMMARY"
           echo "|-------|-----|" >> "$GITHUB_STEP_SUMMARY"
           for img in plane-web plane-space plane-admin plane-live plane-api plane-proxy; do
-            echo "| eyriehq/${img} | ${TAG} |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| osstoolsplus/${img} | ${TAG} |" >> "$GITHUB_STEP_SUMMARY"
           done

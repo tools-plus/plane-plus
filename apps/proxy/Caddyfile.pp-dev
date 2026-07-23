@@ -1,0 +1,38 @@
+# InfraWatch dev proxy — maps to pp-* container names
+(plane_proxy) {
+	request_body {
+		max_size {$FILE_SIZE_LIMIT}
+	}
+
+	redir /spaces /spaces/ permanent
+	reverse_proxy /spaces/* pp-space:3002
+
+	redir /god-mode /god-mode/ permanent
+	reverse_proxy /god-mode/* pp-admin:3001
+
+	reverse_proxy /live/* pp-live:3003
+
+	reverse_proxy /api/* pp-api:8000
+
+	reverse_proxy /auth/* pp-api:8000
+
+	reverse_proxy /static/* pp-api:8000
+
+	reverse_proxy /{$BUCKET_NAME}/* pp-minio:9000
+	reverse_proxy /{$BUCKET_NAME} pp-minio:9000
+3
+	reverse_proxy /* pp-web:3000
+}
+
+{
+	auto_https off
+	servers {
+		max_header_size 25MB
+		client_ip_headers X-Forwarded-For X-Real-IP
+		trusted_proxies static {$TRUSTED_PROXIES:0.0.0.0/0}
+	}
+}
+
+{$SITE_ADDRESS} {
+	import plane_proxy
+}

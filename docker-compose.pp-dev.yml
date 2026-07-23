@@ -9,43 +9,44 @@
 #   RabbitMQ: http://rabbitmq.plane.orb.local:15672
 #
 # First-time setup:
-#   1. cp .env.iw-dev .env
-#   2. cp apps/api/.env.iw-dev apps/api/.env
-#   3. cp apps/web/.env.iw-dev apps/web/.env
-#   4. docker compose -f docker-compose.iw-dev.yml up -d
+#   1. cp .env.pp-dev .env
+#   2. cp apps/api/.env.pp-dev apps/api/.env
+#   3. cp apps/web/.env.pp-dev apps/web/.env
+#   4. docker compose -f docker-compose.pp-dev.yml up -d
 #
 # Rebuild after dependency changes:
-#   docker compose -f docker-compose.iw-dev.yml build --no-cache iw-api iw-web
+#   docker compose -f docker-compose.pp-dev.yml build --no-cache pp-api pp-web
 
+name: pp-dev
 services:
   # ── Infrastructure ────────────────────────────────────────
-  iw-db:
+  pp-db:
     image: postgres:15.7-alpine
-    container_name: iw-db
+    container_name: pp-db
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     volumes:
-      - iw-pgdata:/var/lib/postgresql/data
+      - pp-pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: plane
       POSTGRES_PASSWORD: plane
       POSTGRES_DB: plane
       PGDATA: /var/lib/postgresql/data
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-redis:
+  pp-redis:
     image: valkey/valkey:7.2.11-alpine
-    container_name: iw-redis
+    container_name: pp-redis
     restart: unless-stopped
     volumes:
-      - iw-redisdata:/data
+      - pp-redisdata:/data
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-mq:
+  pp-mq:
     image: rabbitmq:3.13.6-management-alpine
-    container_name: iw-mq
+    container_name: pp-mq
     restart: unless-stopped
     labels:
       dev.orbstack.domains: rabbitmq.plane.orb.local
@@ -54,19 +55,19 @@ services:
       RABBITMQ_DEFAULT_PASS: plane
       RABBITMQ_DEFAULT_VHOST: plane
     volumes:
-      - iw-rabbitmq:/var/lib/rabbitmq
+      - pp-rabbitmq:/var/lib/rabbitmq
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-minio:
+  pp-minio:
     image: minio/minio
-    container_name: iw-minio
+    container_name: pp-minio
     restart: unless-stopped
     labels:
       dev.orbstack.domains: minio.plane.orb.local
     command: server /export --console-address ":9090"
     volumes:
-      - iw-uploads:/export
+      - pp-uploads:/export
     environment:
       MINIO_ROOT_USER: access-key
       MINIO_ROOT_PASSWORD: secret-key
@@ -74,30 +75,30 @@ services:
       MINIO_SERVER_URL: https://plane.orb.local
       MINIO_BROWSER_REDIRECT_URL: http://minio.plane.orb.local:9090
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-minio-setup:
+  pp-minio-setup:
     image: minio/mc
-    container_name: iw-minio-setup
+    container_name: pp-minio-setup
     depends_on:
-      - iw-minio
+      - pp-minio
     restart: "no"
     entrypoint: >
       /bin/sh -c "
       sleep 3 &&
-      mc alias set local http://iw-minio:9000 access-key secret-key &&
+      mc alias set local http://pp-minio:9000 access-key secret-key &&
       mc mb local/uploads -p || true &&
       exit 0
       "
     networks:
-      - iw-dev
+      - pp-dev
 
   # ── Backend (pip deps baked in image, code volume-mounted) ─
-  iw-migrator:
+  pp-migrator:
     build:
       context: ./apps/api
       dockerfile: Dockerfile.dev
-    container_name: iw-migrator
+    container_name: pp-migrator
     restart: "no"
     volumes:
       - ./apps/api:/code
@@ -105,16 +106,16 @@ services:
     env_file:
       - ./apps/api/.env
     depends_on:
-      - iw-db
-      - iw-redis
+      - pp-db
+      - pp-redis
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-api:
+  pp-api:
     build:
       context: ./apps/api
       dockerfile: Dockerfile.dev
-    container_name: iw-api
+    container_name: pp-api
     restart: unless-stopped
     volumes:
       - ./apps/api:/code
@@ -122,18 +123,18 @@ services:
     env_file:
       - ./apps/api/.env
     depends_on:
-      - iw-db
-      - iw-redis
-      - iw-mq
-      - iw-migrator
+      - pp-db
+      - pp-redis
+      - pp-mq
+      - pp-migrator
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-worker:
+  pp-worker:
     build:
       context: ./apps/api
       dockerfile: Dockerfile.dev
-    container_name: iw-worker
+    container_name: pp-worker
     restart: unless-stopped
     volumes:
       - ./apps/api:/code
@@ -141,17 +142,17 @@ services:
     env_file:
       - ./apps/api/.env
     depends_on:
-      - iw-api
-      - iw-db
-      - iw-redis
+      - pp-api
+      - pp-db
+      - pp-redis
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-beat:
+  pp-beat:
     build:
       context: ./apps/api
       dockerfile: Dockerfile.dev
-    container_name: iw-beat
+    container_name: pp-beat
     restart: unless-stopped
     volumes:
       - ./apps/api:/code
@@ -159,110 +160,110 @@ services:
     env_file:
       - ./apps/api/.env
     depends_on:
-      - iw-api
-      - iw-db
-      - iw-redis
+      - pp-api
+      - pp-db
+      - pp-redis
     networks:
-      - iw-dev
+      - pp-dev
 
   # ── Frontend ───────────────────────────────────────────────
   # Installer runs once to populate shared node_modules volume
-  iw-node-installer:
+  pp-node-installer:
     image: node:22-alpine
-    container_name: iw-node-installer
+    container_name: pp-node-installer
     restart: "no"
     working_dir: /app
     volumes:
       - .:/app
-      - iw-node-modules:/app/node_modules
+      - pp-node-modules:/app/node_modules
     command: sh -c "corepack enable pnpm && pnpm install --frozen-lockfile && touch /app/node_modules/.iw-ready"
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-web:
+  pp-web:
     image: node:22-alpine
-    container_name: iw-web
+    container_name: pp-web
     restart: unless-stopped
     working_dir: /app
     volumes:
       - .:/app
-      - iw-node-modules:/app/node_modules
+      - pp-node-modules:/app/node_modules
     env_file:
-      - .env.iw-dev
+      - .env.pp-dev
     environment:
       # VITE vars must be in container env — Vite bakes them in at dev-server startup
       VITE_LIVE_BASE_URL: ${VITE_LIVE_BASE_URL:-}
       VITE_LIVE_BASE_PATH: ${VITE_LIVE_BASE_PATH:-/live}
     command: sh -c "until [ -f /app/node_modules/.iw-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=web"
     depends_on:
-      - iw-api
-      - iw-node-installer
+      - pp-api
+      - pp-node-installer
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-admin:
+  pp-admin:
     image: node:22-alpine
-    container_name: iw-admin
+    container_name: pp-admin
     restart: unless-stopped
     working_dir: /app
     volumes:
       - .:/app
-      - iw-node-modules:/app/node_modules
+      - pp-node-modules:/app/node_modules
     environment:
       VITE_ADMIN_BASE_PATH: "/god-mode"
     command: sh -c "until [ -f /app/node_modules/.iw-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=admin"
     depends_on:
-      - iw-api
-      - iw-node-installer
+      - pp-api
+      - pp-node-installer
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-space:
+  pp-space:
     image: node:22-alpine
-    container_name: iw-space
+    container_name: pp-space
     restart: unless-stopped
     working_dir: /app
     volumes:
       - .:/app
-      - iw-node-modules:/app/node_modules
+      - pp-node-modules:/app/node_modules
     environment:
       VITE_SPACE_BASE_PATH: "/spaces"
     command: sh -c "until [ -f /app/node_modules/.iw-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=space"
     depends_on:
-      - iw-api
-      - iw-node-installer
+      - pp-api
+      - pp-node-installer
     networks:
-      - iw-dev
+      - pp-dev
 
-  iw-live:
+  pp-live:
     image: node:22-alpine
-    container_name: iw-live
+    container_name: pp-live
     restart: unless-stopped
     working_dir: /app
     volumes:
       - .:/app
-      - iw-node-modules:/app/node_modules
+      - pp-node-modules:/app/node_modules
     env_file:
-      - .env.iw-dev
+      - .env.pp-dev
     environment:
       TURBO_TELEMETRY_DISABLED: "1"
       PORT: "3003"
       LIVE_SERVER_SECRET_KEY: ${LIVE_SERVER_SECRET_KEY:-secret-key}
-      REDIS_URL: redis://iw-redis:6379/
-      API_BASE_URL: http://iw-api:8000
+      REDIS_URL: redis://pp-redis:6379/
+      API_BASE_URL: http://pp-api:8000
     command: sh -c "until [ -f /app/node_modules/.iw-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=live"
     depends_on:
-      - iw-api
-      - iw-node-installer
+      - pp-api
+      - pp-node-installer
     networks:
-      - iw-dev
+      - pp-dev
 
   # ── Proxy (Caddy — unified access point) ──────────────────
-  iw-proxy:
+  pp-proxy:
     build:
       context: ./apps/proxy
-      dockerfile: Dockerfile.iw-dev
-    container_name: iw-proxy
+      dockerfile: Dockerfile.pp-dev
+    container_name: pp-proxy
     restart: unless-stopped
     labels:
       dev.orbstack.domains: plane.orb.local
@@ -272,20 +273,20 @@ services:
       SITE_ADDRESS: ":80"
       TRUSTED_PROXIES: "0.0.0.0/0"
     depends_on:
-      - iw-web
-      - iw-api
-      - iw-space
-      - iw-admin
+      - pp-web
+      - pp-api
+      - pp-space
+      - pp-admin
     networks:
-      - iw-dev
+      - pp-dev
 
 volumes:
-  iw-pgdata:
-  iw-redisdata:
-  iw-uploads:
-  iw-rabbitmq:
-  iw-node-modules:
+  pp-pgdata:
+  pp-redisdata:
+  pp-uploads:
+  pp-rabbitmq:
+  pp-node-modules:
 
 networks:
-  iw-dev:
+  pp-dev:
     driver: bridge
