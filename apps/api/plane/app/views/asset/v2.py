@@ -712,10 +712,13 @@ class ProjectBulkAssetEndpoint(BaseAPIView):
         # get the asset id — scope to the project to prevent cross-project IDOR.
         # Assets uploaded *before* their project exists (e.g. a cover image picked
         # during project creation) arrive here with project_id still NULL — this
-        # endpoint is what assigns it below. Accept those, but never an asset that
-        # already belongs to a *different* project.
+        # endpoint is what assigns it below. Accept those, but only when the caller
+        # uploaded them, and never an asset that already belongs to a *different*
+        # project. Without the created_by guard a project member could sweep an
+        # unrelated workspace-level asset (another user's page image, say) into
+        # their project, which also locks the owner out of it.
         assets = FileAsset.objects.filter(id__in=asset_ids, workspace__slug=slug).filter(
-            Q(project_id=project_id) | Q(project_id__isnull=True)
+            Q(project_id=project_id) | Q(project_id__isnull=True, created_by=request.user)
         )
 
         # Get the first asset
