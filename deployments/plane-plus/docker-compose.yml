@@ -61,14 +61,14 @@ x-app-env: &app-env
 
 services:
   web:
-    image: eyriehq/plane-web:${APP_RELEASE:-latest}
+    image: osstoolsplus/plane-web:${APP_RELEASE:-latest}
     restart: unless-stopped
     depends_on:
       - api
       - worker
 
   space:
-    image: eyriehq/plane-space:${APP_RELEASE:-latest}
+    image: osstoolsplus/plane-space:${APP_RELEASE:-latest}
     restart: unless-stopped
     depends_on:
       - api
@@ -76,14 +76,14 @@ services:
       - web
 
   admin:
-    image: eyriehq/plane-admin:${APP_RELEASE:-latest}
+    image: osstoolsplus/plane-admin:${APP_RELEASE:-latest}
     restart: unless-stopped
     depends_on:
       - api
       - web
 
   live:
-    image: eyriehq/plane-live:${APP_RELEASE:-latest}
+    image: osstoolsplus/plane-live:${APP_RELEASE:-latest}
     environment:
       <<: [*live-env, *redis-env]
     restart: unless-stopped
@@ -92,7 +92,7 @@ services:
       - web
 
   api:
-    image: eyriehq/plane-api:${APP_RELEASE:-latest}
+    image: osstoolsplus/plane-api:${APP_RELEASE:-latest}
     command: ./bin/docker-entrypoint-api.sh
     restart: unless-stopped
     volumes:
@@ -105,7 +105,7 @@ services:
       - plane-mq
 
   worker:
-    image: eyriehq/plane-api:${APP_RELEASE:-latest}
+    image: osstoolsplus/plane-api:${APP_RELEASE:-latest}
     command: ./bin/docker-entrypoint-worker.sh
     restart: unless-stopped
     volumes:
@@ -119,7 +119,7 @@ services:
       - plane-mq
 
   beat-worker:
-    image: eyriehq/plane-api:${APP_RELEASE:-latest}
+    image: osstoolsplus/plane-api:${APP_RELEASE:-latest}
     command: ./bin/docker-entrypoint-beat.sh
     restart: unless-stopped
     volumes:
@@ -133,7 +133,7 @@ services:
       - plane-mq
 
   migrator:
-    image: eyriehq/plane-api:${APP_RELEASE:-latest}
+    image: osstoolsplus/plane-api:${APP_RELEASE:-latest}
     command: ./bin/docker-entrypoint-migrator.sh
     restart: "no"
     volumes:
@@ -187,7 +187,7 @@ services:
       - ./data/minio:/export
 
   proxy:
-    image: eyriehq/plane-proxy:${APP_RELEASE:-latest}
+    image: osstoolsplus/plane-proxy:${APP_RELEASE:-latest}
     restart: unless-stopped
     environment:
       <<: *proxy-env
