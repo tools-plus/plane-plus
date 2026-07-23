@@ -1,4 +1,4 @@
-# InfraWatch — Create AgentDoc table for workspace-level markdown notes.
+# Plane Plus — Create AgentDoc table for workspace-level markdown notes.
 #
 # Forwards-only. Pure DDL: new table, new indexes, no data migration.
 # Drop is intentionally not supported in this branch — once we start writing

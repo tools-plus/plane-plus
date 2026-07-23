@@ -9,10 +9,10 @@
  * `IAgentDocsClient` directly.
  */
 
-import { AgentDocsService } from "./iw-agent-docs.service";
-import type { IAgentDocsClient } from "./iw-agent-docs.types";
+import { AgentDocsService } from "./pp-agent-docs.service";
+import type { IAgentDocsClient } from "./pp-agent-docs.types";
 
 export const agentDocsClient: IAgentDocsClient = new AgentDocsService();
 
 export { AgentDocsService };
-export * from "./iw-agent-docs.types";
+export * from "./pp-agent-docs.types";

@@ -1,4 +1,4 @@
-# InfraWatch — PageFolder serializer for wiki folder management.
+# Plane Plus — PageFolder serializer for wiki folder management.
 
 from .base import BaseSerializer
 from plane.db.models import PageFolder

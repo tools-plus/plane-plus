@@ -10,9 +10,9 @@ INSTALL_DIR=$PWD/plane-app
 DOCKER_FILE_PATH=$INSTALL_DIR/docker-compose.yml
 DOCKER_ENV_PATH=$INSTALL_DIR/plane.env
 
-GH_REPO=eyriehq/plane-plus
+GH_REPO=tools-plus/plane-plus
 RELEASE_DOWNLOAD_URL="https://github.com/$GH_REPO/releases/download"
-FALLBACK_DOWNLOAD_URL="https://raw.githubusercontent.com/$GH_REPO/main/deployments/infrawatch"
+FALLBACK_DOWNLOAD_URL="https://raw.githubusercontent.com/$GH_REPO/main/deployments/plane-plus"
 
 export APP_RELEASE=${APP_RELEASE:-latest}
 

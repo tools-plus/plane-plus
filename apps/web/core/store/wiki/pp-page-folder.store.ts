@@ -11,9 +11,9 @@ import { unset } from "lodash-es";
 import { makeObservable, observable, runInAction, action, computed, set } from "mobx";
 import { computedFn } from "mobx-utils";
 // types
-import type { TPageFolder, TPageFolderCreatePayload, TPageFolderUpdatePayload } from "./iw-page-folder.types";
+import type { TPageFolder, TPageFolderCreatePayload, TPageFolderUpdatePayload } from "./pp-page-folder.types";
 // service
-import { PageFolderService } from "@/services/page/iw-page-folder.service";
+import { PageFolderService } from "@/services/page/pp-page-folder.service";
 
 type TLoader = "init-loader" | "mutation-loader" | undefined;
 

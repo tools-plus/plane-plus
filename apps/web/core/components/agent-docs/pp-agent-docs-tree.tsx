@@ -22,7 +22,7 @@ import { ChevronRight, FileText, Folder, FolderOpen, FolderPlus, Plus, Trash2 } 
 import { CustomMenu } from "@plane/ui";
 import { cn } from "@plane/utils";
 import type { TAgentDocTreeNode } from "@/services/agent-docs";
-import { buildAgentDocTree } from "./iw-agent-docs-tree-builder";
+import { buildAgentDocTree } from "./pp-agent-docs-tree-builder";
 
 type CreateMode = "file" | "folder";
 type CreateState = {
@@ -190,7 +190,7 @@ export function AgentDocsTree({ paths, selectedPath, onSelect, onDelete, onCreat
   }
 
   return (
-    <div className="flex flex-col gap-0.5 px-1.5 py-2" data-testid="iw-agent-docs-tree">
+    <div className="flex flex-col gap-0.5 px-1.5 py-2" data-testid="pp-agent-docs-tree">
       {tree.map((node) => (
         <TreeNode
           key={node.path || node.name}
@@ -418,7 +418,7 @@ function CreateInputRow({
   const placeholder = state.mode === "folder" ? "folder-name" : "name (.md optional)";
 
   return (
-    <div className="flex flex-col" data-testid="iw-agent-docs-tree-create-input">
+    <div className="flex flex-col" data-testid="pp-agent-docs-tree-create-input">
       <div className="flex items-center gap-1.5 rounded-md py-1 pr-1 text-13" style={indent}>
         <span className="size-3.5 flex-shrink-0" />
         <Icon className="size-3.5 flex-shrink-0 text-tertiary" />

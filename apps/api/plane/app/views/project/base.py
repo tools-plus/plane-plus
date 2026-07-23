@@ -364,7 +364,7 @@ class ProjectViewSet(BaseViewSet):
                         is_default=True,
                     )
 
-            # InfraWatch — Epic IssueType provisioning for this save (if the
+            # Plane Plus — Epic IssueType provisioning for this save (if the
             # "Epics" toggle, i.e. is_issue_type_enabled, is on) is handled by
             # plane.iw.signals.provision_epic_type_on_enable (Project post_save),
             # so every path that can flip the flag on is covered in one place.

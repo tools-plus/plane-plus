@@ -1,4 +1,4 @@
-# InfraWatch — PP-70 Agent Docs API contract tests.
+# Plane Plus — PP-70 Agent Docs API contract tests.
 #
 # Covers the optimistic-concurrency single-writer protocol end-to-end:
 #   - basic CRUD via api_key_client

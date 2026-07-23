@@ -1,4 +1,4 @@
-# InfraWatch — PageFolder URL patterns for wiki folder management.
+# Plane Plus — PageFolder URL patterns for wiki folder management.
 
 from django.urls import path
 

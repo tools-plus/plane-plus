@@ -1,4 +1,4 @@
-# InfraWatch-specific permissions — isolated to avoid upstream merge conflicts.
+# Plane Plus-specific permissions — isolated to avoid upstream merge conflicts.
 
 from plane.db.models import WorkspaceMember, Page
 from plane.app.permissions import ROLE

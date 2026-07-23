@@ -1,4 +1,4 @@
-# InfraWatch branded space build
+# Plane Plus branded space build
 # Based on: apps/space/Dockerfile.space
 # On upstream merge: diff Dockerfile.space changes and port them here.
 
@@ -57,10 +57,10 @@ ENV VITE_WEB_BASE_URL=$VITE_WEB_BASE_URL
 ARG VITE_WEB_BASE_PATH=""
 ENV VITE_WEB_BASE_PATH=$VITE_WEB_BASE_PATH
 
-ARG VITE_WEBSITE_URL="https://eyriehq.com"
+ARG VITE_WEBSITE_URL="https://github.com/tools-plus/plane-plus"
 ENV VITE_WEBSITE_URL=$VITE_WEBSITE_URL
 
-ARG VITE_SUPPORT_EMAIL="support@eyriehq.com"
+ARG VITE_SUPPORT_EMAIL="plane-plus@mguptahub.com"
 ENV VITE_SUPPORT_EMAIL=$VITE_SUPPORT_EMAIL
 
 COPY .gitignore .gitignore
@@ -71,13 +71,13 @@ COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
-# --- IW branding swaps (after turbo prune copy, before build) ---
-COPY packages/constants/src/metadata-iw.ts packages/constants/src/metadata.ts
-COPY apps/space/app/root-iw.tsx apps/space/app/root.tsx
-COPY iw-brand/favicon-16x16.png apps/space/app/assets/favicon/favicon-16x16.png
-COPY iw-brand/favicon-32x32.png apps/space/app/assets/favicon/favicon-32x32.png
-COPY iw-brand/favicon.ico apps/space/app/assets/favicon/favicon.ico
-# --- end IW branding ---
+# --- Plane Plus branding swaps (after turbo prune copy, before build) ---
+COPY packages/constants/src/metadata-pp.ts packages/constants/src/metadata.ts
+COPY apps/space/app/root-pp.tsx apps/space/app/root.tsx
+COPY pp-brand/favicon-16x16.png apps/space/app/assets/favicon/favicon-16x16.png
+COPY pp-brand/favicon-32x32.png apps/space/app/assets/favicon/favicon-32x32.png
+COPY pp-brand/favicon.ico apps/space/app/assets/favicon/favicon.ico
+# --- end Plane Plus branding ---
 
 # Fetch dependencies to cache store, then install offline with dev deps
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm fetch --store-dir=/pnpm/store
@@ -96,11 +96,11 @@ COPY --from=installer /app/node_modules ./node_modules
 
 WORKDIR /app/apps/space
 
-# --- IW branding: overwrite static assets in build output ---
-COPY iw-brand/favicon-16x16.png ./build/client/assets/favicon/favicon-16x16.png
-COPY iw-brand/favicon-32x32.png ./build/client/assets/favicon/favicon-32x32.png
-COPY iw-brand/favicon.ico ./build/client/assets/favicon/favicon.ico
-# --- end IW static overrides ---
+# --- Plane Plus branding: overwrite static assets in build output ---
+COPY pp-brand/favicon-16x16.png ./build/client/assets/favicon/favicon-16x16.png
+COPY pp-brand/favicon-32x32.png ./build/client/assets/favicon/favicon-32x32.png
+COPY pp-brand/favicon.ico ./build/client/assets/favicon/favicon.ico
+# --- end Plane Plus static overrides ---
 
 EXPOSE 3000
 

@@ -70,8 +70,8 @@ import type { IUserStore } from "./user";
 import { UserStore } from "./user";
 import type { IWorkspaceWikiPageStore } from "./wiki";
 import { WorkspaceWikiPageStore } from "./wiki";
-import type { IPageFolderStore } from "./wiki/iw-page-folder.store";
-import { PageFolderStore } from "./wiki/iw-page-folder.store";
+import type { IPageFolderStore } from "./wiki/pp-page-folder.store";
+import { PageFolderStore } from "./wiki/pp-page-folder.store";
 import type { IWorkspaceRootStore } from "./workspace";
 
 enableStaticRendering(typeof window === "undefined");

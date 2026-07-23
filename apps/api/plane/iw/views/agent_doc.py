@@ -1,4 +1,4 @@
-# InfraWatch — Agent Docs API (API key authenticated)
+# Plane Plus — Agent Docs API (API key authenticated)
 #
 # Workspace-level markdown notes with optimistic-concurrency single-writer
 # semantics. The interface shape mirrors `tools/obsidian/vault.py` so the

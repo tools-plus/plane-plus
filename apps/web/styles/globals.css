@@ -200,33 +200,33 @@
 }
 
 /* AI/VAULTS preview — GFM extras
- * The hand-rolled markdown renderer (iw-agent-docs-markdown.ts) emits GFM
+ * The hand-rolled markdown renderer (pp-agent-docs-markdown.ts) emits GFM
  * task-lists and footnotes with stable class hooks. @tailwindcss/typography
  * doesn't style either by default, so we override here. Scoped under the
  * preview pane so we don't accidentally restyle every prose surface.
  */
-[data-testid="iw-agent-docs-preview"] ul.contains-task-list {
+[data-testid="pp-agent-docs-preview"] ul.contains-task-list {
   list-style: none;
   padding-left: 0;
 }
-[data-testid="iw-agent-docs-preview"] li.task-list-item {
+[data-testid="pp-agent-docs-preview"] li.task-list-item {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
 }
-[data-testid="iw-agent-docs-preview"] li.task-list-item input[type="checkbox"] {
+[data-testid="pp-agent-docs-preview"] li.task-list-item input[type="checkbox"] {
   /* stop prose from forcing margin-top on form controls */
   margin: 0;
   position: relative;
   top: 1px;
 }
 
-[data-testid="iw-agent-docs-preview"] section.footnotes {
+[data-testid="pp-agent-docs-preview"] section.footnotes {
   margin-top: 2em;
   font-size: 0.875em;
   color: rgb(var(--color-text-300));
 }
-[data-testid="iw-agent-docs-preview"] a.footnote-back {
+[data-testid="pp-agent-docs-preview"] a.footnote-back {
   text-decoration: none;
   margin-left: 0.25rem;
 }

@@ -32,7 +32,7 @@ import { useSearchParams } from "react-router";
 import { Loader2, RefreshCcw, Save } from "lucide-react";
 import { cn } from "@plane/utils";
 import { AgentDocStaleError, agentDocsClient, type TAgentDoc } from "@/services/agent-docs";
-import { renderMarkdown } from "./iw-agent-docs-markdown";
+import { renderMarkdown } from "./pp-agent-docs-markdown";
 
 type Props = {
   workspaceSlug: string;
@@ -187,7 +187,7 @@ export function AgentDocsEditor({ workspaceSlug, path, onAfterSave }: Props) {
   }
 
   return (
-    <div className="flex size-full flex-col" data-testid="iw-agent-docs-editor">
+    <div className="flex size-full flex-col" data-testid="pp-agent-docs-editor">
       {/* toolbar — tab strip on the left, doc status + save on the right.
           Tabs use the same underline-on-active pattern as the issue
           detail epic-overview tabs (after-pseudo bottom border so the
@@ -246,15 +246,15 @@ export function AgentDocsEditor({ workspaceSlug, path, onAfterSave }: Props) {
             spellCheck={false}
             className="block size-full resize-none border-0 bg-transparent p-4 font-code text-13 leading-relaxed text-primary outline-none"
             placeholder="Write markdown here…"
-            data-testid="iw-agent-docs-textarea"
+            data-testid="pp-agent-docs-textarea"
           />
         ) : (
           <div
             className="prose-sm dark:prose-invert absolute inset-0 max-w-none overflow-y-auto p-4 prose"
-            data-testid="iw-agent-docs-preview"
+            data-testid="pp-agent-docs-preview"
             // renderMarkdown returns sanitized HTML — escapes raw text first,
             // then applies a small set of inline transforms. NEVER pass raw
-            // doc content here: see iw-agent-docs-markdown.ts for the contract.
+            // doc content here: see pp-agent-docs-markdown.ts for the contract.
             dangerouslySetInnerHTML={{ __html: renderMarkdown(draft) }}
           />
         )}

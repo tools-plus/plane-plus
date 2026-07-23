@@ -1,4 +1,4 @@
-# InfraWatch — Project Pages API (API key authenticated)
+# Plane Plus — Project Pages API (API key authenticated)
 # Exposes project pages under /api/v1/ with X-Api-Key auth
 
 import json

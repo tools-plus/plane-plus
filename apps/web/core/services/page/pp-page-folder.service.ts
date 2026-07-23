@@ -8,7 +8,7 @@ import type {
   TPageFolder,
   TPageFolderCreatePayload,
   TPageFolderUpdatePayload,
-} from "@/store/wiki/iw-page-folder.types";
+} from "@/store/wiki/pp-page-folder.types";
 import { APIService } from "@/services/api.service";
 
 export class PageFolderService extends APIService {

@@ -1,4 +1,4 @@
-# InfraWatch — PageFolder model for organizing workspace wiki pages.
+# Plane Plus — PageFolder model for organizing workspace wiki pages.
 
 from django.db import models
 

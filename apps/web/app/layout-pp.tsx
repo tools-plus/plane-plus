@@ -1,5 +1,5 @@
 /**
- * InfraWatch branding override for layout.tsx
+ * Plane Plus branding override for layout.tsx
  * Based on: apps/web/app/layout.tsx
  *
  * Dockerfile replaces layout.tsx with this file at build time.
@@ -11,7 +11,7 @@ import Script from "next/script";
 // styles
 import "@/styles/globals.css";
 
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL, TWITTER_USER_NAME } from "@plane/constants";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@plane/constants";
 
 // helpers
 import { cn } from "@plane/utils";
@@ -41,7 +41,6 @@ export const meta = () => [
   { property: "og:image:width", content: "1200" },
   { property: "og:image:height", content: "630" },
   { property: "og:image:alt", content: SITE_TITLE },
-  { name: "twitter:site", content: TWITTER_USER_NAME },
   { name: "twitter:card", content: "summary_large_image" },
   { name: "twitter:image", content: `${SITE_URL}og-image.png` },
   { name: "twitter:image:width", content: "1200" },

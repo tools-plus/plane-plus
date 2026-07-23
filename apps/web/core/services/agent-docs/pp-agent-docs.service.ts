@@ -34,7 +34,7 @@ import {
   type IAgentDocsClient,
   type TAgentDoc,
   type TAgentDocListResponse,
-} from "./iw-agent-docs.types";
+} from "./pp-agent-docs.types";
 
 export class AgentDocsService extends APIService implements IAgentDocsClient {
   constructor(BASE_URL?: string) {

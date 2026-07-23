@@ -56,7 +56,7 @@ export const SidebarWrapper = observer(function SidebarWrapper(props: TSidebarWr
 
           <div className="flex items-center justify-between gap-2 px-2">
             <div className="flex items-center gap-1.5 pt-1">
-              {title === "Projects" && <img src="/favicon/iw-icon-32.png" alt="IW" className="size-4 flex-shrink-0" />}
+              {title === "Projects" && <img src="/favicon/pp-icon-32.png" alt="PP" className="size-4 flex-shrink-0" />}
               <span className="text-16 font-medium text-primary">{title}</span>
             </div>
             <div className="flex items-center gap-2">

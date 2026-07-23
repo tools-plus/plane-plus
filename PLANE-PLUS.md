@@ -1,4 +1,4 @@
-# InfraWatch — Fork Change Manifest
+# Plane Plus — Fork Change Manifest
 
 Tracks all changes we've made on `main` vs upstream `master`.
 Use this when merging upstream updates to know what to protect.
@@ -21,7 +21,7 @@ git merge origin/master
 #    - plane.iw URLs are mounted
 #    - estimate_patterns are included in API URLs
 #    - build workflow exists
-#    - deployments/infrawatch/ exists
+#    - deployments/plane-plus/ exists
 
 # 5. Test, commit, push
 ```
@@ -34,12 +34,12 @@ These are entirely ours — upstream will never touch them:
 
 | File/Dir | Purpose |
 |----------|---------|
-| `.github/workflows/build-infrawatchlabs.yml` | Our Docker build/release pipeline (6 images) |
-| `deployments/infrawatch/docker-compose.yml` | Our production docker-compose |
-| `deployments/infrawatch/variables.env` | Our env template |
-| `deployments/infrawatch/install.sh` | CLI installer (install/start/stop/upgrade/backup) |
+| `.github/workflows/build-plane-plus.yml` | Our Docker build/release pipeline (6 images) |
+| `deployments/plane-plus/docker-compose.yml` | Our production docker-compose |
+| `deployments/plane-plus/variables.env` | Our env template |
+| `deployments/plane-plus/install.sh` | CLI installer (install/start/stop/upgrade/backup) |
 | `apps/api/plane/iw/` | Our custom Django app (Pages & Estimates API v1 endpoints) |
-| `INFRAWATCHLABS.md` | This file |
+| `PLANE-PLUS.md` | This file |
 
 ### 2. Modified Upstream Files (conflict risk on merge)
 
@@ -82,7 +82,7 @@ urlpatterns = [
 
 ### 3. Rebranded Files (from fix/version-stamp branch)
 
-These replace `makeplane` references with `infrawatchlabs`:
+These replace `makeplane` references with `plane-plus`:
 
 | File | What changed |
 |------|-------------|

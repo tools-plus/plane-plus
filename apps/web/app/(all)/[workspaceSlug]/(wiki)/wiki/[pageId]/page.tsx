@@ -22,7 +22,7 @@ import type { TPageRootConfig, TPageRootHandlers } from "@/components/pages/edit
 import { PageRoot } from "@/components/pages/editor/page-root";
 import { PageHeaderActions } from "@/components/pages/header/actions";
 // PP-3: Breadcrumb
-import { FolderBreadcrumb } from "../../components/iw-folder-breadcrumb";
+import { FolderBreadcrumb } from "../../components/pp-folder-breadcrumb";
 // hooks
 import { useEditorConfig } from "@/hooks/editor";
 import { useEditorAsset } from "@/hooks/store/use-editor-asset";

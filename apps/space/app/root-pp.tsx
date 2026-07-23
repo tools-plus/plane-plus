@@ -1,5 +1,5 @@
 /**
- * InfraWatch branding override for space root.tsx
+ * Plane Plus branding override for space root.tsx
  * Based on: apps/space/app/root.tsx
  *
  * Dockerfile replaces root.tsx with this file at build time.
@@ -76,12 +76,11 @@ export const meta: Route.MetaFunction = () => [
   { name: "description", content: APP_DESCRIPTION },
   { property: "og:title", content: APP_TITLE },
   { property: "og:description", content: APP_DESCRIPTION },
-  { property: "og:url", content: "https://projects.eyriehq.com/" },
+  { property: "og:url", content: "https://github.com/tools-plus/plane-plus/" },
   {
     name: "keywords",
-    content: "infrawatch, project management, public roadmap, work items, collaboration",
+    content: "plane plus, project management, public roadmap, work items, collaboration",
   },
-  { name: "twitter:site", content: "@infrawatchlabs" },
 ];
 
 export default function Root() {

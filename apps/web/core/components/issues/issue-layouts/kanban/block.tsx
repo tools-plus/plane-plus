@@ -33,7 +33,7 @@ import useIssuePeekOverviewRedirection from "@/hooks/use-issue-peek-overview-red
 import { usePlatformOS } from "@/hooks/use-platform-os";
 // local components
 import type { TRenderQuickActions } from "../list/list-view-types";
-import { ParentChip } from "../iw-parent-chip";
+import { ParentChip } from "../pp-parent-chip";
 import { IssueProperties } from "../properties/all-properties";
 
 interface IssueBlockProps {

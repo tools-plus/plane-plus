@@ -17,7 +17,7 @@
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { agentDocsClient, AgentDocStaleError } from "@/services/agent-docs";
-import { AgentDocsTree } from "@/components/agent-docs/iw-agent-docs-tree";
+import { AgentDocsTree } from "@/components/agent-docs/pp-agent-docs-tree";
 import { useVaultsContext } from "./vaults-context";
 
 export function VaultsSidebarContent() {

@@ -17,8 +17,8 @@ import { usePageFolders } from "@/hooks/store/use-page-folders";
 import { EPageStoreType, usePageStore } from "@/hooks/store";
 import { useAppRouter } from "@/hooks/use-app-router";
 // local components
-import { FolderContextMenu } from "./iw-folder-context-menu";
-import { WikiPageNode } from "./iw-page-node";
+import { FolderContextMenu } from "./pp-folder-context-menu";
+import { WikiPageNode } from "./pp-page-node";
 
 type Props = {
   folderId: string;

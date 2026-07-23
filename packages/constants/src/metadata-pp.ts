@@ -11,13 +11,11 @@ export const SITE_TITLE = "Plane Plus";
 export const SITE_DESCRIPTION = "Project management for Plane Plus — work items, cycles, modules, and pages.";
 export const SITE_KEYWORDS =
   "plane plus, project management, observability, monitoring, work items, agile, kanban, collaboration";
-export const SITE_URL = "https://projects.eyriehq.com/";
-export const TWITTER_USER_NAME = "@infrawatchlabs";
+export const SITE_URL = "https://github.com/tools-plus/plane-plus/";
 
 // Space Metadata
 export const SPACE_SITE_NAME = "Plane Plus Publish";
 export const SPACE_SITE_TITLE = "Plane Plus Publish";
 export const SPACE_SITE_DESCRIPTION = "Public boards and roadmaps powered by Plane Plus.";
 export const SPACE_SITE_KEYWORDS = "plane plus, project management, public roadmap, work items, collaboration";
-export const SPACE_SITE_URL = "https://projects.eyriehq.com/";
-export const SPACE_TWITTER_USER_NAME = "@infrawatchlabs";
+export const SPACE_SITE_URL = "https://github.com/tools-plus/plane-plus/";

@@ -4,7 +4,7 @@
 
 import { useContext } from "react";
 import { StoreContext } from "@/lib/store-context";
-import type { IPageFolderStore } from "@/store/wiki/iw-page-folder.store";
+import type { IPageFolderStore } from "@/store/wiki/pp-page-folder.store";
 
 export const usePageFolders = (): IPageFolderStore => {
   const context = useContext(StoreContext);

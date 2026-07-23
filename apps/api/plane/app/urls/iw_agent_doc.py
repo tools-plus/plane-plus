@@ -1,4 +1,4 @@
-# InfraWatch — Agent Docs URL patterns (session-authenticated).
+# Plane Plus — Agent Docs URL patterns (session-authenticated).
 #
 # Mirror of plane.iw.urls' agent-doc routes, but mounted under /api/ so the
 # session-auth web UI can reach them with cookies (the X-Api-Key versions

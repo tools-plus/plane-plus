@@ -1,4 +1,4 @@
-# InfraWatch — Workspace Wiki Pages API (API key authenticated)
+# Plane Plus — Workspace Wiki Pages API (API key authenticated)
 # Exposes workspace-level pages under /api/v1/ with X-Api-Key auth
 
 import json

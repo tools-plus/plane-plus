@@ -33,7 +33,7 @@ import type { TSelectionHelper } from "@/hooks/use-multiple-select";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 // local components
 import type { TRenderQuickActions } from "../list/list-view-types";
-import { ParentChip } from "../iw-parent-chip";
+import { ParentChip } from "../pp-parent-chip";
 import { isIssueNew } from "../utils";
 import { IssueColumn } from "./issue-column";
 

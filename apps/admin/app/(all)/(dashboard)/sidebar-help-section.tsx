@@ -31,7 +31,7 @@ const helpOptions = [
   },
   {
     name: "Report a bug",
-    href: "https://github.com/eyriehq/plane-plus/issues/new/choose",
+    href: "https://github.com/tools-plus/plane-plus/issues/new/choose",
     Icon: GithubIcon,
   },
 ];

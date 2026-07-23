@@ -1,4 +1,4 @@
-# InfraWatch — Agent Docs API (OpenAPI 3.1)
+# Plane Plus — Agent Docs API (OpenAPI 3.1)
 #
 # Workspace-level markdown notes with optimistic-concurrency single-writer
 # semantics. Replaces the local Obsidian vault for agent state (plans, memory,
@@ -24,7 +24,7 @@
 
 openapi: "3.1.0"
 info:
-  title: InfraWatch Agent Docs
+  title: Plane Plus Agent Docs
   version: "1.0.0"
   description: |
     Workspace-level pure-markdown store with ETag/If-Match optimistic

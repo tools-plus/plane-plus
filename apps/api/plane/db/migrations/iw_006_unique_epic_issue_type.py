@@ -1,4 +1,4 @@
-# InfraWatch — Enforce at most one active Epic IssueType per workspace
+# Plane Plus — Enforce at most one active Epic IssueType per workspace
 #
 # PP-85: nothing previously stopped a workspace from ending up with more
 # than one active (is_epic=True, deleted_at__isnull=True) IssueType — e.g.

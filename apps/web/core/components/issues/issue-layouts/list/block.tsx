@@ -30,7 +30,7 @@ import { useProject } from "@/hooks/store/use-project";
 import type { TSelectionHelper } from "@/hooks/use-multiple-select";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 // local imports
-import { ParentChip } from "../iw-parent-chip";
+import { ParentChip } from "../pp-parent-chip";
 import { calculateIdentifierWidth } from "../utils";
 import type { TRenderQuickActions } from "./list-view-types";
 

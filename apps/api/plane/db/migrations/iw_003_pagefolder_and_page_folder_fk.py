@@ -1,4 +1,4 @@
-# InfraWatch — Create PageFolder model and add folder FK to Page
+# Plane Plus — Create PageFolder model and add folder FK to Page
 
 import uuid
 

@@ -1,4 +1,4 @@
-# InfraWatch — Epic API (API key authenticated)
+# Plane Plus — Epic API (API key authenticated)
 # Exposes epic CRUD under /api/v1/ with X-Api-Key auth
 # Epics are issues with type.is_epic=True
 
