@@ -1,4 +1,4 @@
-# InfraWatch — Local dev environment for Plane Plus (Orbstack)
+# Plane Plus — Local dev environment (Orbstack)
 #
 # Access via Orbstack DNS:
 #   App:      https://plane.orb.local
@@ -176,7 +176,7 @@ services:
     volumes:
       - .:/app
       - pp-node-modules:/app/node_modules
-    command: sh -c "corepack enable pnpm && pnpm install --frozen-lockfile && touch /app/node_modules/.iw-ready"
+    command: sh -c "corepack enable pnpm && pnpm install --frozen-lockfile && touch /app/node_modules/.pp-ready"
     networks:
       - pp-dev
 
@@ -194,7 +194,7 @@ services:
       # VITE vars must be in container env — Vite bakes them in at dev-server startup
       VITE_LIVE_BASE_URL: ${VITE_LIVE_BASE_URL:-}
       VITE_LIVE_BASE_PATH: ${VITE_LIVE_BASE_PATH:-/live}
-    command: sh -c "until [ -f /app/node_modules/.iw-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=web"
+    command: sh -c "until [ -f /app/node_modules/.pp-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=web"
     depends_on:
       - pp-api
       - pp-node-installer
@@ -211,7 +211,7 @@ services:
       - pp-node-modules:/app/node_modules
     environment:
       VITE_ADMIN_BASE_PATH: "/god-mode"
-    command: sh -c "until [ -f /app/node_modules/.iw-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=admin"
+    command: sh -c "until [ -f /app/node_modules/.pp-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=admin"
     depends_on:
       - pp-api
       - pp-node-installer
@@ -228,7 +228,7 @@ services:
       - pp-node-modules:/app/node_modules
     environment:
       VITE_SPACE_BASE_PATH: "/spaces"
-    command: sh -c "until [ -f /app/node_modules/.iw-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=space"
+    command: sh -c "until [ -f /app/node_modules/.pp-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=space"
     depends_on:
       - pp-api
       - pp-node-installer
@@ -251,7 +251,7 @@ services:
       LIVE_SERVER_SECRET_KEY: ${LIVE_SERVER_SECRET_KEY:-secret-key}
       REDIS_URL: redis://pp-redis:6379/
       API_BASE_URL: http://pp-api:8000
-    command: sh -c "until [ -f /app/node_modules/.iw-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=live"
+    command: sh -c "until [ -f /app/node_modules/.pp-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=live"
     depends_on:
       - pp-api
       - pp-node-installer

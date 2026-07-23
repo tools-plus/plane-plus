@@ -1,4 +1,4 @@
-# InfraWatch dev proxy — maps to pp-* container names
+# Plane Plus dev proxy — maps to pp-* container names
 (plane_proxy) {
 	request_body {
 		max_size {$FILE_SIZE_LIMIT}
@@ -20,7 +20,7 @@
 
 	reverse_proxy /{$BUCKET_NAME}/* pp-minio:9000
 	reverse_proxy /{$BUCKET_NAME} pp-minio:9000
-3
+
 	reverse_proxy /* pp-web:3000
 }
 
