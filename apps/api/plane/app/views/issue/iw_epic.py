@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
 
-# InfraWatch — Epic-specific views
+# Plane Plus — Epic-specific views
 # Epics are issues with type.is_epic=True
 
 from collections import defaultdict

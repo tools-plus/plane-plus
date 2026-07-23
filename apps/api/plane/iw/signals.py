@@ -1,5 +1,5 @@
 """
-InfraWatch signals.
+Plane Plus signals.
 
 - Auto-derive epic state from child work items: when a child issue's state
   changes, recompute the parent epic's state based on the aggregate of all

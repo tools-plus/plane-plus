@@ -50,7 +50,7 @@ export type TAppSectionDefinition = {
  * shape Power-K commands expect. The 3x3 menu uses iconNode directly. */
 const IWLogoIcon: ComponentType<{ className?: string }> = ({ className }) => (
   // eslint-disable-next-line @next/next/no-img-element
-  <img src="/favicon/iw-icon-32.png" alt="IW" className={className} />
+  <img src="/favicon/pp-icon-32.png" alt="PP" className={className} />
 );
 
 export const APP_SECTIONS: TAppSectionDefinition[] = [
@@ -58,7 +58,7 @@ export const APP_SECTIONS: TAppSectionDefinition[] = [
     id: "projects",
     label: "Projects",
     i18nKey: "iw.app_switcher.projects",
-    iconNode: <img src="/favicon/iw-icon-32.png" alt="IW" className="size-4" />,
+    iconNode: <img src="/favicon/pp-icon-32.png" alt="PP" className="size-4" />,
     icon: IWLogoIcon,
     hrefBuilder: (slug) => `/${slug}/`,
     isActiveSelector: (p) => p.isProjectsPath && !p.isNotificationsPath,

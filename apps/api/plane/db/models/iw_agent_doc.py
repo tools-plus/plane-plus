@@ -1,4 +1,4 @@
-# InfraWatch — AgentDoc model: workspace-level markdown notes with
+# Plane Plus — AgentDoc model: workspace-level markdown notes with
 # optimistic-concurrency single-writer semantics.
 #
 # Replaces MGupta's local Obsidian vault (plans/, memory/, learnings/, specs/,

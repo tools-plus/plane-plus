@@ -1,4 +1,4 @@
-# InfraWatch — Backfill Epic IssueType for projects with Epics already enabled
+# Plane Plus — Backfill Epic IssueType for projects with Epics already enabled
 #
 # PP-85: iw_002 seeded an Epic IssueType for every workspace that existed at
 # that time, but projects/workspaces created afterwards (or projects that

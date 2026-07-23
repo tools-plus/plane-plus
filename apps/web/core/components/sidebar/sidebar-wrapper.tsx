@@ -16,7 +16,7 @@ import { CustomizeNavigationDialog } from "@/components/navigation/customize-nav
 import { useAppTheme } from "@/hooks/store/use-app-theme";
 import useSize from "@/hooks/use-window-size";
 // plane web components
-import { WorkspaceEditionBadge } from "@/plane-web/components/workspace/edition-badge";
+import { WorkspaceEditionBadge } from "@/components/workspace/edition-badge";
 import { AppSidebarToggleButton } from "./sidebar-toggle-button";
 import { IconButton } from "@plane/propel/icon-button";
 
@@ -56,7 +56,7 @@ export const SidebarWrapper = observer(function SidebarWrapper(props: TSidebarWr
 
           <div className="flex items-center justify-between gap-2 px-2">
             <div className="flex items-center gap-1.5 pt-1">
-              {title === "Projects" && <img src="/favicon/iw-icon-32.png" alt="IW" className="size-4 flex-shrink-0" />}
+              {title === "Projects" && <img src="/favicon/pp-icon-32.png" alt="PP" className="size-4 flex-shrink-0" />}
               <span className="text-16 font-medium text-primary">{title}</span>
             </div>
             <div className="flex items-center gap-2">

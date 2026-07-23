@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
 
-# InfraWatch — Epic URL patterns
+# Plane Plus — Epic URL patterns
 
 from django.urls import path
 

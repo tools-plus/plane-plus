@@ -1,0 +1,215 @@
+name: Build & Push Plane Plus
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: "Type of build"
+        required: true
+        type: choice
+        default: "Build"
+        options:
+          - "Build"
+          - "Release"
+      release_version:
+        description: "Release version (e.g. v1.0.0) — required for Release builds"
+        type: string
+        default: ""
+      is_prerelease:
+        description: "Is this a pre-release?"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOCKER_ORG: osstoolsplus
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  setup:
+    name: Build Setup
+    runs-on: ubuntu-24.04
+    outputs:
+      image_tag: ${{ steps.vars.outputs.image_tag }}
+      is_release: ${{ steps.vars.outputs.is_release }}
+      is_prerelease: ${{ steps.vars.outputs.is_prerelease }}
+    steps:
+      - name: Set build variables
+        id: vars
+        run: |
+          BUILD_TYPE="${{ github.event.inputs.build_type }}"
+          IS_PRERELEASE="${{ github.event.inputs.is_prerelease }}"
+
+          if [ "$BUILD_TYPE" == "Release" ]; then
+            REL_VERSION="${{ github.event.inputs.release_version }}"
+
+            if [ -z "$REL_VERSION" ]; then
+              echo "::error::Release version is required for Release builds"
+              exit 1
+            fi
+
+            semver_regex="^v([0-9]+)\.([0-9]+)\.([0-9]+)(-[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*)?$"
+            if [[ ! ${REL_VERSION} =~ $semver_regex ]]; then
+              echo "::error::Invalid version format: ${REL_VERSION}. Must be semver (e.g. v1.2.3 or v1.2.3-alpha-1)"
+              exit 1
+            fi
+
+            echo "image_tag=${REL_VERSION}" >> "$GITHUB_OUTPUT"
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+            echo "is_prerelease=${IS_PRERELEASE}" >> "$GITHUB_OUTPUT"
+            echo "::notice::Release build: ${REL_VERSION} (prerelease: ${IS_PRERELEASE})"
+          else
+            TAG=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9.-]//g')
+            echo "image_tag=${TAG}" >> "$GITHUB_OUTPUT"
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+            echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Branch build: ${TAG}"
+          fi
+
+  build:
+    name: Build ${{ matrix.image }}
+    runs-on: ubuntu-24.04
+    needs: [setup]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: plane-web
+            context: .
+            dockerfile: ./apps/web/Dockerfile.pp-web
+          - image: plane-space
+            context: .
+            dockerfile: ./apps/space/Dockerfile.pp-space
+          - image: plane-admin
+            context: .
+            dockerfile: ./apps/admin/Dockerfile.pp-admin
+          - image: plane-live
+            context: .
+            dockerfile: ./apps/live/Dockerfile.live
+          - image: plane-api
+            context: ./apps/api
+            dockerfile: ./apps/api/Dockerfile.api
+          - image: plane-proxy
+            context: ./apps/proxy
+            dockerfile: ./apps/proxy/Dockerfile.ce
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Stamp version in package.json
+        run: |
+          TAG="${{ needs.setup.outputs.image_tag }}"
+          # Update root and app package.json versions
+          for f in package.json apps/web/package.json apps/admin/package.json apps/space/package.json; do
+            if [ -f "$f" ]; then
+              sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"${TAG}\"/" "$f"
+            fi
+          done
+
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        run: |
+          ORG="${{ env.DOCKER_ORG }}"
+          IMAGE="${{ matrix.image }}"
+          TAG="${{ needs.setup.outputs.image_tag }}"
+          IS_RELEASE="${{ needs.setup.outputs.is_release }}"
+          IS_PRERELEASE="${{ needs.setup.outputs.is_prerelease }}"
+
+          TAGS="${ORG}/${IMAGE}:${TAG}"
+
+          if [ "$IS_RELEASE" == "true" ] && [ "$IS_PRERELEASE" != "true" ]; then
+            # Full release: version + stable
+            TAGS="${TAGS},${ORG}/${IMAGE}:stable"
+          elif [ "$IS_RELEASE" != "true" ] && [ "$TAG" == "main" ]; then
+            # Branch build from main: branch-name + latest
+            TAGS="${TAGS},${ORG}/${IMAGE}:latest"
+          fi
+          # Prerelease or non-main branch: version/branch tag only
+
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=registry,ref=${{ env.DOCKER_ORG }}/${{ matrix.image }}:buildcache
+          cache-to: type=registry,ref=${{ env.DOCKER_ORG }}/${{ matrix.image }}:buildcache,mode=max
+
+  upload-assets:
+    name: Upload Deploy Assets
+    runs-on: ubuntu-24.04
+    needs: [setup, build]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Prepare assets
+        run: |
+          mkdir -p deploy-assets
+          IMG_TAG="${{ needs.setup.outputs.image_tag }}"
+          cp deployments/plane-plus/install.sh deploy-assets/install.sh
+          sed "s/\${APP_RELEASE:-latest}/\${APP_RELEASE:-${IMG_TAG}}/g" \
+            deployments/plane-plus/docker-compose.yml > deploy-assets/docker-compose.yml
+          sed "s/^APP_RELEASE=latest/APP_RELEASE=${IMG_TAG}/g" \
+            deployments/plane-plus/variables.env > deploy-assets/variables.env
+
+      - name: Upload as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plane-deploy-${{ needs.setup.outputs.image_tag }}
+          path: deploy-assets/
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-24.04
+    if: needs.setup.outputs.is_release == 'true'
+    needs: [setup, upload-assets]
+    steps:
+      - name: Download deploy assets
+        uses: actions/download-artifact@v4
+        with:
+          name: plane-deploy-${{ needs.setup.outputs.image_tag }}
+          path: release-assets/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.setup.outputs.image_tag }}
+          name: ${{ needs.setup.outputs.image_tag }}
+          prerelease: ${{ needs.setup.outputs.is_prerelease == 'true' }}
+          generate_release_notes: true
+          files: |
+            release-assets/install.sh
+            release-assets/docker-compose.yml
+            release-assets/variables.env
+
+  summary:
+    name: Build Summary
+    runs-on: ubuntu-24.04
+    if: always()
+    needs: [setup, build]
+    steps:
+      - name: Summary
+        run: |
+          TAG="${{ needs.setup.outputs.image_tag }}"
+          TYPE="${{ needs.setup.outputs.is_release == 'true' && 'Release' || 'Build' }}"
+          PRE="${{ needs.setup.outputs.is_prerelease == 'true' && ' (prerelease)' || '' }}"
+          echo "## ${TYPE} Complete${PRE}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Image | Tag |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|-----|" >> "$GITHUB_STEP_SUMMARY"
+          for img in plane-web plane-space plane-admin plane-live plane-api plane-proxy; do
+            echo "| osstoolsplus/${img} | ${TAG} |" >> "$GITHUB_STEP_SUMMARY"
+          done

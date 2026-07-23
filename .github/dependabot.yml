@@ -1,0 +1,40 @@
+# Dependabot version updates.
+#
+# Scoped to GitHub Actions only, deliberately. Dependabot *security* alerts
+# already run repo-wide without this file; what was missing is version
+# updates, which is why the workflow actions drifted a full major behind
+# (download-artifact sat on v4 while v8 shipped) with nothing to catch it.
+#
+# npm/pip are intentionally NOT enabled here: this is a fork that tracks
+# makeplane/plane upstream, and letting Dependabot bump application
+# dependencies would fight the upstream sync. Those come in via merges from
+# upstream instead.
+version: 2
+
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(ci)"
+    groups:
+      # Minor/patch bumps are near-always safe to take together — one PR,
+      # low review cost, keeps the long tail current.
+      actions-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Majors are separated because action majors carry real breaking
+      # changes (the upload-artifact v4 immutability rework, for one), so
+      # they need to be reviewed and exercised on their own rather than
+      # riding along in a batch.
+      actions-major:
+        patterns:
+          - "*"
+        update-types:
+          - "major"

@@ -138,8 +138,9 @@ license.
 ## Security
 
 - **Plane Plus-specific modifications** (anything under `plane/iw/…` in the API,
-  or `iw-`-prefixed code): open a private security advisory via
-  [GitHub](https://github.com/tools-plus/plane-plus/security/advisories/new).
+  or `pp-`-prefixed code): open a private security advisory via
+  [GitHub](https://github.com/tools-plus/plane-plus/security/advisories/new),
+  or email **plane-plus@mguptahub.com**.
 - **Upstream Plane code**: please use upstream's channels — see
   [upstream security policy](https://github.com/makeplane/plane/blob/master/SECURITY.md).
 

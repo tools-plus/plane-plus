@@ -1,4 +1,4 @@
-# InfraWatch-specific URL patterns — isolated to avoid upstream merge conflicts.
+# Plane Plus-specific URL patterns — isolated to avoid upstream merge conflicts.
 
 from django.urls import path
 

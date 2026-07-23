@@ -1,4 +1,4 @@
-# InfraWatch — Seed Epic IssueType for all workspaces
+# Plane Plus — Seed Epic IssueType for all workspaces
 
 from django.db import migrations
 

@@ -1,4 +1,4 @@
-# InfraWatch — Hierarchy depth validation utilities
+# Plane Plus — Hierarchy depth validation utilities
 # Enforces: Epic -> Work Item -> Sub-item (3 levels max)
 #
 # Rules:

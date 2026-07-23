@@ -4,13 +4,23 @@
  * See the LICENSE file for details.
  */
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const useKeypress = (key: string, callback: (event: KeyboardEvent) => void) => {
+  // Every call site passes either an inline arrow or a handler defined in the
+  // component body, so `callback` is a fresh reference on each render. Keeping
+  // it in a ref lets the listener effect depend only on `key`, instead of
+  // removing and re-adding a document-level keydown listener every render.
+  const callbackRef = useRef(callback);
+
+  useEffect(() => {
+    callbackRef.current = callback;
+  });
+
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
       if (event.key === key) {
-        callback(event);
+        callbackRef.current(event);
       }
     };
 
@@ -19,7 +29,7 @@ const useKeypress = (key: string, callback: (event: KeyboardEvent) => void) => {
     return () => {
       document.removeEventListener("keydown", handleKeydown);
     };
-  }, [key, callback]);
+  }, [key]);
 };
 
 export default useKeypress;

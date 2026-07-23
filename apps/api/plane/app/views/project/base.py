@@ -41,6 +41,7 @@ from plane.db.models import (
 )
 from plane.db.models.intake import IntakeIssueStatus
 from plane.utils.host import base_host
+from plane.utils.order_queryset import PROJECT_ORDER_BY_ALLOWLIST, sanitize_order_by
 
 
 class ProjectViewSet(BaseViewSet):
@@ -128,7 +129,11 @@ class ProjectViewSet(BaseViewSet):
 
         if request.GET.get("per_page", False) and request.GET.get("cursor", False):
             return self.paginate(
-                order_by=request.GET.get("order_by", "-created_at"),
+                order_by=sanitize_order_by(
+                    request.GET.get("order_by", "-created_at"),
+                    PROJECT_ORDER_BY_ALLOWLIST,
+                    "-created_at",
+                ),
                 request=request,
                 queryset=(projects),
                 on_results=lambda projects: ProjectListSerializer(projects, many=True).data,
@@ -332,7 +337,7 @@ class ProjectViewSet(BaseViewSet):
 
         workspace = Workspace.objects.get(slug=slug)
 
-        project = Project.objects.get(pk=pk)
+        project = Project.objects.get(pk=pk, workspace__slug=slug)
         intake_view = request.data.get("inbox_view", project.intake_view)
         current_instance = json.dumps(ProjectSerializer(project).data, cls=DjangoJSONEncoder)
         if project.archived_at:
@@ -359,7 +364,7 @@ class ProjectViewSet(BaseViewSet):
                         is_default=True,
                     )
 
-            # InfraWatch — Epic IssueType provisioning for this save (if the
+            # Plane Plus — Epic IssueType provisioning for this save (if the
             # "Epics" toggle, i.e. is_issue_type_enabled, is on) is handled by
             # plane.iw.signals.provision_epic_type_on_enable (Project post_save),
             # so every path that can flip the flag on is covered in one place.

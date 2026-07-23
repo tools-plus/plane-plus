@@ -24,21 +24,17 @@ import { cn, generateWorkItemLink } from "@plane/utils";
 // components
 import RenderIfVisible from "@/components/core/render-if-visible-HOC";
 import { HIGHLIGHT_CLASS, getIssueBlockId } from "@/components/issues/issue-layouts/utils";
-// helpers
+import { IssueIdentifier } from "@/components/issues/issue-detail/issue-identifier";
 // hooks
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useKanbanView } from "@/hooks/store/use-kanban-view";
 import { useProject } from "@/hooks/store/use-project";
 import useIssuePeekOverviewRedirection from "@/hooks/use-issue-peek-overview-redirection";
 import { usePlatformOS } from "@/hooks/use-platform-os";
-// plane web components
-import { IssueIdentifier } from "@/plane-web/components/issues/issue-details/issue-identifier";
 // local components
-import { IssueStats } from "@/plane-web/components/issues/issue-layouts/issue-stats";
 import type { TRenderQuickActions } from "../list/list-view-types";
-import { ParentChip } from "../iw-parent-chip";
+import { ParentChip } from "../pp-parent-chip";
 import { IssueProperties } from "../properties/all-properties";
-import { WithDisplayPropertiesHOC } from "../properties/with-display-properties-HOC";
 
 interface IssueBlockProps {
   issueId: string;
@@ -94,9 +90,6 @@ const KanbanIssueDetailsBlock = observer(function KanbanIssueDetailsBlock(props:
     </button>
   );
 
-  // derived values
-  const subIssueCount = issue?.sub_issues_count ?? 0;
-
   useOutsideClickDetector(menuActionRef, () => setIsMenuActive(false));
 
   return (
@@ -146,16 +139,6 @@ const KanbanIssueDetailsBlock = observer(function KanbanIssueDetailsBlock(props:
         isReadOnly={isReadOnly}
         isEpic={isEpic}
       />
-
-      {isEpic && displayProperties && (
-        <WithDisplayPropertiesHOC
-          displayProperties={displayProperties}
-          displayPropertyKey="sub_issue_count"
-          shouldRenderProperty={(properties) => !!properties.sub_issue_count && !!subIssueCount}
-        >
-          <IssueStats issueId={issue.id} className="mt-2 font-medium text-tertiary" />
-        </WithDisplayPropertiesHOC>
-      )}
     </>
   );
 });
@@ -253,14 +236,8 @@ export const KanbanIssueBlock = observer(function KanbanIssueBlock(props: IssueB
         },
       })
     );
-  }, [
-    issue?.id,
-    isDragAllowed,
-    canDropOverIssue,
-    setIsCurrentBlockDragging,
-    setIsDraggingOverBlock,
-    setIsKanbanDragging,
-  ]);
+    // oxlint-disable-next-line eslint-plugin-react-hooks/exhaustive-deps
+  }, [cardRef?.current, issue?.id, isDragAllowed, canDropOverIssue, setIsCurrentBlockDragging, setIsDraggingOverBlock]);
 
   if (!issue) return null;
 

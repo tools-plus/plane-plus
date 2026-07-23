@@ -22,14 +22,14 @@ import type { TPageRootConfig, TPageRootHandlers } from "@/components/pages/edit
 import { PageRoot } from "@/components/pages/editor/page-root";
 import { PageHeaderActions } from "@/components/pages/header/actions";
 // PP-3: Breadcrumb
-import { FolderBreadcrumb } from "../../components/iw-folder-breadcrumb";
+import { FolderBreadcrumb } from "../../components/pp-folder-breadcrumb";
 // hooks
 import { useEditorConfig } from "@/hooks/editor";
 import { useEditorAsset } from "@/hooks/store/use-editor-asset";
 import { useWorkspace } from "@/hooks/store/use-workspace";
 import { useAppRouter } from "@/hooks/use-app-router";
 // plane web hooks
-import { EPageStoreType, usePage, usePageStore } from "@/plane-web/hooks/store";
+import { EPageStoreType, usePage, usePageStore } from "@/hooks/store";
 // services
 import { WorkspacePageService } from "@/services/page/workspace-page.service";
 import { WorkspaceService } from "@/services/workspace.service";

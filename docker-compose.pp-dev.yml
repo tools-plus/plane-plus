@@ -1,0 +1,292 @@
+# Plane Plus — Local dev environment (Orbstack)
+#
+# Access via Orbstack DNS:
+#   App:      https://plane.orb.local
+#   Admin:    https://plane.orb.local/god-mode/
+#   Spaces:   https://plane.orb.local/spaces/
+#   API:      https://plane.orb.local/api/
+#   Minio:    http://minio.plane.orb.local:9090
+#   RabbitMQ: http://rabbitmq.plane.orb.local:15672
+#
+# First-time setup:
+#   1. cp .env.pp-dev .env
+#   2. cp apps/api/.env.pp-dev apps/api/.env
+#   3. cp apps/web/.env.pp-dev apps/web/.env
+#   4. docker compose -f docker-compose.pp-dev.yml up -d
+#
+# Rebuild after dependency changes:
+#   docker compose -f docker-compose.pp-dev.yml build --no-cache pp-api pp-web
+
+name: pp-dev
+services:
+  # ── Infrastructure ────────────────────────────────────────
+  pp-db:
+    image: postgres:15.7-alpine
+    container_name: pp-db
+    restart: unless-stopped
+    command: postgres -c 'max_connections=1000'
+    volumes:
+      - pp-pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: plane
+      POSTGRES_PASSWORD: plane
+      POSTGRES_DB: plane
+      PGDATA: /var/lib/postgresql/data
+    networks:
+      - pp-dev
+
+  pp-redis:
+    image: valkey/valkey:7.2.11-alpine
+    container_name: pp-redis
+    restart: unless-stopped
+    volumes:
+      - pp-redisdata:/data
+    networks:
+      - pp-dev
+
+  pp-mq:
+    image: rabbitmq:3.13.6-management-alpine
+    container_name: pp-mq
+    restart: unless-stopped
+    labels:
+      dev.orbstack.domains: rabbitmq.plane.orb.local
+    environment:
+      RABBITMQ_DEFAULT_USER: plane
+      RABBITMQ_DEFAULT_PASS: plane
+      RABBITMQ_DEFAULT_VHOST: plane
+    volumes:
+      - pp-rabbitmq:/var/lib/rabbitmq
+    networks:
+      - pp-dev
+
+  pp-minio:
+    image: minio/minio
+    container_name: pp-minio
+    restart: unless-stopped
+    labels:
+      dev.orbstack.domains: minio.plane.orb.local
+    command: server /export --console-address ":9090"
+    volumes:
+      - pp-uploads:/export
+    environment:
+      MINIO_ROOT_USER: access-key
+      MINIO_ROOT_PASSWORD: secret-key
+      # Allow MinIO to validate presigned URLs generated with the external proxy hostname
+      MINIO_SERVER_URL: https://plane.orb.local
+      MINIO_BROWSER_REDIRECT_URL: http://minio.plane.orb.local:9090
+    networks:
+      - pp-dev
+
+  pp-minio-setup:
+    image: minio/mc
+    container_name: pp-minio-setup
+    depends_on:
+      - pp-minio
+    restart: "no"
+    entrypoint: >
+      /bin/sh -c "
+      sleep 3 &&
+      mc alias set local http://pp-minio:9000 access-key secret-key &&
+      mc mb local/uploads -p || true &&
+      exit 0
+      "
+    networks:
+      - pp-dev
+
+  # ── Backend (pip deps baked in image, code volume-mounted) ─
+  pp-migrator:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    container_name: pp-migrator
+    restart: "no"
+    volumes:
+      - ./apps/api:/code
+    command: ./bin/docker-entrypoint-migrator.sh --settings=plane.settings.local
+    env_file:
+      - ./apps/api/.env
+    depends_on:
+      - pp-db
+      - pp-redis
+    networks:
+      - pp-dev
+
+  pp-api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    container_name: pp-api
+    restart: unless-stopped
+    volumes:
+      - ./apps/api:/code
+    command: ./bin/docker-entrypoint-api-local.sh
+    env_file:
+      - ./apps/api/.env
+    depends_on:
+      - pp-db
+      - pp-redis
+      - pp-mq
+      - pp-migrator
+    networks:
+      - pp-dev
+
+  pp-worker:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    container_name: pp-worker
+    restart: unless-stopped
+    volumes:
+      - ./apps/api:/code
+    command: ./bin/docker-entrypoint-worker.sh
+    env_file:
+      - ./apps/api/.env
+    depends_on:
+      - pp-api
+      - pp-db
+      - pp-redis
+    networks:
+      - pp-dev
+
+  pp-beat:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    container_name: pp-beat
+    restart: unless-stopped
+    volumes:
+      - ./apps/api:/code
+    command: ./bin/docker-entrypoint-beat.sh
+    env_file:
+      - ./apps/api/.env
+    depends_on:
+      - pp-api
+      - pp-db
+      - pp-redis
+    networks:
+      - pp-dev
+
+  # ── Frontend ───────────────────────────────────────────────
+  # Installer runs once to populate shared node_modules volume
+  pp-node-installer:
+    image: node:22-alpine
+    container_name: pp-node-installer
+    restart: "no"
+    working_dir: /app
+    volumes:
+      - .:/app
+      - pp-node-modules:/app/node_modules
+    command: sh -c "corepack enable pnpm && pnpm install --frozen-lockfile && touch /app/node_modules/.pp-ready"
+    networks:
+      - pp-dev
+
+  pp-web:
+    image: node:22-alpine
+    container_name: pp-web
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - .:/app
+      - pp-node-modules:/app/node_modules
+    env_file:
+      - .env.pp-dev
+    environment:
+      # VITE vars must be in container env — Vite bakes them in at dev-server startup
+      VITE_LIVE_BASE_URL: ${VITE_LIVE_BASE_URL:-}
+      VITE_LIVE_BASE_PATH: ${VITE_LIVE_BASE_PATH:-/live}
+    command: sh -c "until [ -f /app/node_modules/.pp-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=web"
+    depends_on:
+      - pp-api
+      - pp-node-installer
+    networks:
+      - pp-dev
+
+  pp-admin:
+    image: node:22-alpine
+    container_name: pp-admin
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - .:/app
+      - pp-node-modules:/app/node_modules
+    environment:
+      VITE_ADMIN_BASE_PATH: "/god-mode"
+    command: sh -c "until [ -f /app/node_modules/.pp-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=admin"
+    depends_on:
+      - pp-api
+      - pp-node-installer
+    networks:
+      - pp-dev
+
+  pp-space:
+    image: node:22-alpine
+    container_name: pp-space
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - .:/app
+      - pp-node-modules:/app/node_modules
+    environment:
+      VITE_SPACE_BASE_PATH: "/spaces"
+    command: sh -c "until [ -f /app/node_modules/.pp-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=space"
+    depends_on:
+      - pp-api
+      - pp-node-installer
+    networks:
+      - pp-dev
+
+  pp-live:
+    image: node:22-alpine
+    container_name: pp-live
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - .:/app
+      - pp-node-modules:/app/node_modules
+    env_file:
+      - .env.pp-dev
+    environment:
+      TURBO_TELEMETRY_DISABLED: "1"
+      PORT: "3003"
+      LIVE_SERVER_SECRET_KEY: ${LIVE_SERVER_SECRET_KEY:-secret-key}
+      REDIS_URL: redis://pp-redis:6379/
+      API_BASE_URL: http://pp-api:8000
+    command: sh -c "until [ -f /app/node_modules/.pp-ready ]; do sleep 2; done && corepack enable pnpm && pnpm dev --filter=live"
+    depends_on:
+      - pp-api
+      - pp-node-installer
+    networks:
+      - pp-dev
+
+  # ── Proxy (Caddy — unified access point) ──────────────────
+  pp-proxy:
+    build:
+      context: ./apps/proxy
+      dockerfile: Dockerfile.pp-dev
+    container_name: pp-proxy
+    restart: unless-stopped
+    labels:
+      dev.orbstack.domains: plane.orb.local
+    environment:
+      FILE_SIZE_LIMIT: "5242880"
+      BUCKET_NAME: uploads
+      SITE_ADDRESS: ":80"
+      TRUSTED_PROXIES: "0.0.0.0/0"
+    depends_on:
+      - pp-web
+      - pp-api
+      - pp-space
+      - pp-admin
+    networks:
+      - pp-dev
+
+volumes:
+  pp-pgdata:
+  pp-redisdata:
+  pp-uploads:
+  pp-rabbitmq:
+  pp-node-modules:
+
+networks:
+  pp-dev:
+    driver: bridge

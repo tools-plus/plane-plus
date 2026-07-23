@@ -12,7 +12,7 @@
  */
 
 import { NotebookText } from "lucide-react";
-import { AgentDocsEditor } from "@/components/agent-docs/iw-agent-docs-editor";
+import { AgentDocsEditor } from "@/components/agent-docs/pp-agent-docs-editor";
 import { useVaultsContext } from "./vaults-context";
 
 function VaultsHomePage() {

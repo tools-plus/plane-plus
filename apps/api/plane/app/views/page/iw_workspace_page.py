@@ -1,4 +1,4 @@
-# InfraWatch-specific views — isolated to avoid upstream merge conflicts.
+# Plane Plus-specific views — isolated to avoid upstream merge conflicts.
 
 # Python imports
 import json

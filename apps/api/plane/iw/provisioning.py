@@ -1,4 +1,4 @@
-# InfraWatch — Epic IssueType provisioning
+# Plane Plus — Epic IssueType provisioning
 #
 # The "Epics" toggle in project settings maps to Project.is_issue_type_enabled
 # (there is no separate is_epic_enabled field). Whenever a project turns that

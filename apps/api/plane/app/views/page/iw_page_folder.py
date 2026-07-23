@@ -1,4 +1,4 @@
-# InfraWatch — PageFolder ViewSet for wiki folder management.
+# Plane Plus — PageFolder ViewSet for wiki folder management.
 
 from rest_framework import status
 from rest_framework.response import Response

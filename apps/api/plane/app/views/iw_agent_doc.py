@@ -1,4 +1,4 @@
-# InfraWatch — Agent Docs API (session-authenticated mirror).
+# Plane Plus — Agent Docs API (session-authenticated mirror).
 #
 # Same logic as plane.iw.views.agent_doc — only the auth surface differs:
 #   - plane.iw.views.agent_doc → /api/v1/...   (X-Api-Key, for SDK / MCP / scripts)

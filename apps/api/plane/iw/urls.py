@@ -1,4 +1,4 @@
-# InfraWatch — Custom API v1 endpoints
+# Plane Plus — Custom API v1 endpoints
 # All endpoints use API key authentication (X-Api-Key header)
 
 from django.urls import path

@@ -1,5 +1,0 @@
-FROM caddy:2.10.0-alpine
-
-RUN apk add --no-cache nss-tools bash curl
-
-COPY Caddyfile.iw-dev /etc/caddy/Caddyfile

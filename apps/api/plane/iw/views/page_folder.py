@@ -1,4 +1,4 @@
-# InfraWatch — Workspace Wiki Page Folders API (API key authenticated)
+# Plane Plus — Workspace Wiki Page Folders API (API key authenticated)
 # Exposes workspace-level page folders under /api/v1/ with X-Api-Key auth.
 #
 # The internal app already has a PageFolderViewSet for cookie/JWT clients.

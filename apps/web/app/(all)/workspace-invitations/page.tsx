@@ -13,7 +13,7 @@ import { CheckIcon, CloseIcon } from "@plane/propel/icons";
 import { LogoSpinner } from "@/components/common/logo-spinner";
 import { EmptySpace, EmptySpaceItem } from "@/components/ui/empty-space";
 // constants
-import { WORKSPACE_INVITATION } from "@/constants/fetch-keys";
+import { WORKSPACE_INVITATION } from "@plane/constants";
 // helpers
 import { EPageTypes } from "@/helpers/authentication.helper";
 // hooks
@@ -111,7 +111,7 @@ function WorkspaceInvitationPage() {
               ) : (
                 <EmptySpaceItem Icon={Boxes} title="Continue to home" href="/" />
               )}
-              <EmptySpaceItem Icon={Star} title="Star us on GitHub" href="https://github.com/eyriehq/plane-plus" />
+              <EmptySpaceItem Icon={Star} title="Star us on GitHub" href="https://github.com/tools-plus/plane-plus" />
               <EmptySpaceItem
                 Icon={Share2}
                 title="Join our community of active creators"

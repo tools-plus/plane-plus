@@ -1,4 +1,4 @@
-# InfraWatch — Epics feature gate
+# Plane Plus — Epics feature gate
 #
 # PP-85: "epics enabled for a project" == Project.is_issue_type_enabled (the
 # project-settings "Epics" toggle; there is no separate is_epic_enabled

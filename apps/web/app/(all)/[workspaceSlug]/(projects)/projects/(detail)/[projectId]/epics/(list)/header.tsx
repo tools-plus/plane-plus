@@ -25,9 +25,9 @@ import { useProject } from "@/hooks/store/use-project";
 import { useUserPermissions } from "@/hooks/store/user";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { usePlatformOS } from "@/hooks/use-platform-os";
-// plane web imports
-import { CommonProjectBreadcrumbs } from "@/plane-web/components/breadcrumbs/common";
-import { CreateUpdateEpicModal } from "@/plane-web/components/epics/epic-modal/modal";
+// components
+import { CommonProjectBreadcrumbs } from "@/components/breadcrumbs/common";
+import { CreateUpdateEpicModal } from "@/components/epic-modal/modal";
 
 export const ProjectEpicsHeader = observer(function ProjectEpicsHeader() {
   const router = useAppRouter();
