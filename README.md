@@ -2,8 +2,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/plane-plus-lockup-light.svg">
-    <img src=".github/assets/plane-plus-lockup-dark.svg" alt="Plane Plus" width="460">
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/plane-plus-lockup-light.png">
+    <img src=".github/assets/plane-plus-lockup-dark.png" alt="Plane Plus" width="460">
   </picture>
 </p>
 
@@ -17,11 +17,11 @@
   <b>An AI-agent-first project management platform, built on <a href="https://plane.so">Plane</a>.</b>
 </p>
 <p align="center">
-  by <a href="https://github.com/tools-plus/plane-plus">Tools Plus</a>
+  by <a href="https://github.com/tools-plus">Tools Plus</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/tools-plus/plane-plus"><b>Website</b></a> •
+  <a href="https://github.com/tools-plus"><b>GitHub</b></a> •
   <a href="https://github.com/tools-plus/plane-plus-sdk-mcp"><b>SDK & MCP server</b></a> •
   <a href="./README-PLANE.md"><b>Upstream Plane README</b></a>
 </p>
@@ -138,7 +138,9 @@ license.
 ## Security
 
 - **Plane Plus-specific modifications** (anything under `plane/iw/…` in the API,
-  or `iw-`-prefixed code): email **plane-plus@mguptahub.com**.
+  or `pp-`-prefixed code): open a private security advisory via
+  [GitHub](https://github.com/tools-plus/plane-plus/security/advisories/new),
+  or email **plane-plus@mguptahub.com**.
 - **Upstream Plane code**: please use upstream's channels — see
   [upstream security policy](https://github.com/makeplane/plane/blob/master/SECURITY.md).
 
@@ -152,5 +154,5 @@ additions (agent APIs, MCP integration, SDK features) belong here.
 
 <p align="center">
   <em>Plane Plus is developed and maintained by
-  <a href="https://github.com/tools-plus/plane-plus">Tools Plus</a>.</em>
+  <a href="https://github.com/tools-plus">Tools Plus</a>.</em>
 </p>
